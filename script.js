@@ -3,29 +3,29 @@
   let targetX = 50, targetY = 40;
   let currentX = 50, currentY = 40;
   let rafId = null;
-
+ 
   function setFromEvent(clientX, clientY) {
     targetX = (clientX / window.innerWidth) * 100;
     targetY = (clientY / window.innerHeight) * 100;
     if (!rafId) rafId = requestAnimationFrame(tick);
   }
-
+ 
   function tick() {
     // ease toward the target so the grid drifts rather than snapping
     currentX += (targetX - currentX) * 0.08;
     currentY += (targetY - currentY) * 0.08;
     root.style.setProperty('--grid-x', currentX.toFixed(2) + '%');
     root.style.setProperty('--grid-y', currentY.toFixed(2) + '%');
-
+ 
     if (Math.abs(targetX - currentX) > 0.05 || Math.abs(targetY - currentY) > 0.05) {
       rafId = requestAnimationFrame(tick);
     } else {
       rafId = null;
     }
   }
-
+ 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+ 
   if (!prefersReducedMotion) {
     window.addEventListener('mousemove', (e) => setFromEvent(e.clientX, e.clientY));
     window.addEventListener('touchmove', (e) => {
@@ -34,42 +34,42 @@
       }
     }, { passive: true });
   }
-
+ 
   const items = Array.from(document.querySelectorAll('.checklist__item'));
   const headline = document.getElementById('headline');
   const subline = document.getElementById('subline');
   const rerunBtn = document.getElementById('rerun');
-
+ 
   const hostEl = document.getElementById('host');
   const pathEl = document.getElementById('path');
   const timeEl = document.getElementById('time');
   const viewportEl = document.getElementById('viewport');
-
+ 
   function fillMeta() {
     hostEl.textContent = window.location.host || 'local file';
     pathEl.textContent = window.location.pathname || '/';
     timeEl.textContent = new Date().toLocaleString();
     viewportEl.textContent = window.innerWidth + ' × ' + window.innerHeight;
   }
-
+ 
   let timers = [];
-
+ 
   function clearTimers() {
     timers.forEach(clearTimeout);
     timers = [];
   }
-
+ 
   function reset() {
     items.forEach((item) => item.classList.remove('is-done'));
     headline.textContent = 'standing by';
     headline.classList.remove('is-live');
     subline.textContent = 'Waiting on the checks above…';
   }
-
+ 
   function runChecks() {
     clearTimers();
     reset();
-
+ 
     items.forEach((item) => {
       const delay = Number(item.dataset.delay || 0);
       const t = setTimeout(() => {
@@ -77,7 +77,7 @@
       }, delay);
       timers.push(t);
     });
-
+ 
     const lastDelay = Math.max(...items.map((i) => Number(i.dataset.delay || 0)));
     const finish = setTimeout(() => {
       headline.textContent = 'site is live';
@@ -86,19 +86,19 @@
     }, lastDelay + 500);
     timers.push(finish);
   }
-
+ 
   rerunBtn.addEventListener('click', () => {
     fillMeta();
     runChecks();
   });
-
+ 
   window.addEventListener('resize', () => {
     viewportEl.textContent = window.innerWidth + ' × ' + window.innerHeight;
   });
-
+ 
   fillMeta();
   runChecks();
-
+ 
   // ---- Converter ----
   const UNITS = {
     length: {
@@ -130,13 +130,13 @@
       example: { from: 'USD', to: 'EUR' },
     },
   };
-
+ 
   // Fallback currency rates (approximate, used only if the live fetch fails)
   const FALLBACK_RATES_USD = { USD: 1, EUR: 0.92, GBP: 0.79, JPY: 156, CAD: 1.37, AUD: 1.52 };
-
+ 
   let currentCategory = 'length';
   let liveRates = null; // populated from network if available
-
+ 
   const tabs = Array.from(document.querySelectorAll('.converter__tab'));
   const fromValue = document.getElementById('fromValue');
   const toValue = document.getElementById('toValue');
@@ -144,7 +144,7 @@
   const toUnit = document.getElementById('toUnit');
   const swapBtn = document.getElementById('swapUnits');
   const note = document.getElementById('converterNote');
-
+ 
   function populateUnits(category) {
     const config = UNITS[category];
     const keys = Object.keys(config.units);
@@ -153,49 +153,49 @@
     fromUnit.value = config.example.from;
     toUnit.value = config.example.to;
   }
-
+ 
   function convertLengthOrWeight(category, value, from, to) {
     const { units } = UNITS[category];
     const meters = value * units[from];
     return meters / units[to];
   }
-
+ 
   function convertTemperature(value, from, to) {
     if (from === to) return value;
     let celsius;
     if (from === 'C') celsius = value;
     else if (from === 'F') celsius = (value - 32) * (5 / 9);
     else celsius = value - 273.15;
-
+ 
     if (to === 'C') return celsius;
     if (to === 'F') return celsius * (9 / 5) + 32;
     return celsius + 273.15;
   }
-
+ 
   function convertCurrency(value, from, to) {
     const rates = liveRates || FALLBACK_RATES_USD;
     if (!rates[from] || !rates[to]) return null;
     const usd = value / rates[from];
     return usd * rates[to];
   }
-
+ 
   function formatNumber(n) {
     if (!isFinite(n)) return '—';
     const abs = Math.abs(n);
     const digits = abs >= 100 ? 2 : abs >= 1 ? 4 : 6;
     return Number(n.toFixed(digits)).toString();
   }
-
+ 
   function runConversion() {
     const value = parseFloat(fromValue.value);
     const from = fromUnit.value;
     const to = toUnit.value;
-
+ 
     if (isNaN(value)) {
       toValue.value = '';
       return;
     }
-
+ 
     let result;
     if (currentCategory === 'temperature') {
       result = convertTemperature(value, from, to);
@@ -204,21 +204,24 @@
     } else {
       result = convertLengthOrWeight(currentCategory, value, from, to);
     }
-
+ 
     toValue.value = result === null ? 'unavailable' : formatNumber(result);
-
-    const source = currentCategory === 'currency'
-      ? (liveRates ? 'live rates' : 'offline estimate')
-      : 'instant';
-    note.textContent = `1 ${from} \u2248 ${result === null ? '?' : formatNumber(convertOne(currentCategory, from, to))} ${to} (${source})`;
+ 
+    const oneUnit = result === null ? '?' : formatNumber(convertOne(currentCategory, from, to));
+    if (currentCategory === 'currency') {
+      const source = liveRates ? 'live rates' : 'offline estimate';
+      note.textContent = `1 ${from} \u2248 ${oneUnit} ${to} (${source})`;
+    } else {
+      note.textContent = `1 ${from} \u2248 ${oneUnit} ${to}`;
+    }
   }
-
+ 
   function convertOne(category, from, to) {
     if (category === 'temperature') return convertTemperature(1, from, to);
     if (category === 'currency') return convertCurrency(1, from, to);
     return convertLengthOrWeight(category, 1, from, to);
   }
-
+ 
   function setCategory(category) {
     currentCategory = category;
     tabs.forEach((tab) => tab.classList.toggle('is-active', tab.dataset.category === category));
@@ -226,26 +229,26 @@
     fromValue.value = 1;
     runConversion();
   }
-
+ 
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => setCategory(tab.dataset.category));
   });
-
+ 
   [fromValue, fromUnit, toUnit].forEach((el) => {
     el.addEventListener('input', runConversion);
     el.addEventListener('change', runConversion);
   });
-
+ 
   swapBtn.addEventListener('click', () => {
     const f = fromUnit.value;
     fromUnit.value = toUnit.value;
     toUnit.value = f;
     runConversion();
   });
-
+ 
   async function loadLiveRates() {
     try {
-      const res = await fetch('https://api.frankfurter.app/latest?from=USD');
+      const res = await fetch('https://api.frankfurter.dev/v1/latest?base=USD');
       if (!res.ok) throw new Error('bad response');
       const data = await res.json();
       liveRates = { USD: 1, ...data.rates };
@@ -255,39 +258,39 @@
       liveRates = null;
     }
   }
-
+ 
   populateUnits(currentCategory);
   runConversion();
   loadLiveRates();
-
+ 
   // ---- Draggable windows ----
   let topZ = 10;
-
+ 
   function makeDraggable(panel) {
     const handle = panel.querySelector('.console__bar');
     if (!handle) return;
-
+ 
     handle.addEventListener('pointerdown', (e) => {
       // only respond to primary button / touch, not right-click etc.
       if (e.button !== undefined && e.button !== 0) return;
-
+ 
       const rect = panel.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
       const offsetY = e.clientY - rect.top;
-
+ 
       if (!panel.classList.contains('is-floating')) {
         panel.style.width = rect.width + 'px';
         panel.style.left = rect.left + 'px';
         panel.style.top = rect.top + 'px';
         panel.classList.add('is-floating');
       }
-
+ 
       panel.style.zIndex = String(++topZ);
       handle.classList.add('is-dragging');
       handle.setPointerCapture(e.pointerId);
-
+ 
       const panelRect = panel.getBoundingClientRect();
-
+ 
       function onMove(ev) {
         const minVisible = 60;
         let left = ev.clientX - offsetX;
@@ -297,18 +300,18 @@
         panel.style.left = left + 'px';
         panel.style.top = top + 'px';
       }
-
+ 
       function onUp(ev) {
         handle.classList.remove('is-dragging');
         handle.releasePointerCapture(ev.pointerId);
         handle.removeEventListener('pointermove', onMove);
         handle.removeEventListener('pointerup', onUp);
       }
-
+ 
       handle.addEventListener('pointermove', onMove);
       handle.addEventListener('pointerup', onUp);
     });
   }
-
+ 
   document.querySelectorAll('.console').forEach(makeDraggable);
 })();
