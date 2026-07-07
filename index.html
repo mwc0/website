@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Check — Deployment Live</title>
+<meta name="description" content="A minimal test page to confirm GitHub Pages hosting is working.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <main class="console">
+    <header class="console__bar">
+      <span class="dot dot--red"></span>
+      <span class="dot dot--amber"></span>
+      <span class="dot dot--green"></span>
+      <span class="console__title">signal-check.log</span>
+    </header>
+
+    <section class="console__body">
+      <p class="console__line console__line--muted">$ deploy --target github-pages</p>
+
+      <ul class="checklist" id="checklist" aria-live="polite">
+        <li class="checklist__item" data-delay="200">Reaching repository</li>
+        <li class="checklist__item" data-delay="900">Serving static assets</li>
+        <li class="checklist__item" data-delay="1600">Loading stylesheet</li>
+        <li class="checklist__item" data-delay="2300">Running page script</li>
+        <li class="checklist__item" data-delay="3000">Confirming DNS + HTTPS</li>
+      </ul>
+
+      <div class="result" id="result">
+        <h1 class="result__headline" id="headline">standing by</h1>
+        <p class="result__sub" id="subline">Waiting on the checks above&hellip;</p>
+      </div>
+
+      <dl class="meta">
+        <div class="meta__row">
+          <dt>host</dt>
+          <dd id="host">—</dd>
+        </div>
+        <div class="meta__row">
+          <dt>path</dt>
+          <dd id="path">—</dd>
+        </div>
+        <div class="meta__row">
+          <dt>local time</dt>
+          <dd id="time">—</dd>
+        </div>
+        <div class="meta__row">
+          <dt>viewport</dt>
+          <dd id="viewport">—</dd>
+        </div>
+      </dl>
+
+      <button class="rerun" id="rerun" type="button">re-run checks</button>
+    </section>
+
+    <footer class="console__footer">
+      built to confirm one thing: if you can read this, GitHub Pages is serving your site.
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
