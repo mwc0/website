@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>matthew.quest — games</title>
-<meta name="description" content="Games on matthew.quest.">
+<meta name="description" content="Play Snake on matthew.quest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,15 +22,27 @@
       <span class="dot dot--red"></span>
       <span class="dot dot--amber"></span>
       <span class="dot dot--green"></span>
-      <span class="console__title">games.sh</span>
+      <span class="console__title">snake.sh</span>
     </header>
 
     <div class="console__body">
-      <p class="console__line console__line--muted">$ ls games/</p>
+      <p class="console__line console__line--muted">$ ./snake --run</p>
 
-      <div class="games-empty">
-        <h1 class="games-empty__headline">nothing here yet</h1>
-        <p class="games-empty__sub">This corner of matthew.quest is reserved for games — check back soon.</p>
+      <div class="snake">
+        <div class="snake__hud">
+          <span class="snake__stat">score <strong id="snakeScore">0</strong></span>
+          <span class="snake__stat">best <strong id="snakeBest">0</strong></span>
+        </div>
+
+        <div class="snake__stage">
+          <canvas id="snakeCanvas" width="400" height="400" aria-label="Snake game board"></canvas>
+          <div class="snake__overlay" id="snakeOverlay">
+            <p class="snake__overlay-title" id="snakeOverlayTitle">snake</p>
+            <p class="snake__overlay-sub" id="snakeOverlaySub">press an arrow key or wasd to start</p>
+          </div>
+        </div>
+
+        <p class="snake__hint">arrow keys / wasd to move · space to pause · tap board on mobile</p>
       </div>
     </div>
 
@@ -55,5 +67,6 @@
   </div>
 
   <script src="../common.js?v=1"></script>
+  <script src="games.js?v=1"></script>
 </body>
 </html>
