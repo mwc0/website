@@ -65,11 +65,16 @@
   </main>
   </div>
 
+  <div class="taskbar-hover-zone" aria-hidden="true"></div>
   <nav class="taskbar" id="taskbar" aria-label="Site navigation">
     <div class="taskbar__panel">
       <a class="taskbar__link" href="games/">games</a>
     </div>
-    <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false">menu</button>
+    <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle menu">
+      <svg class="taskbar__arrow" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </nav>
 
   <script src="common.js?v=1"></script>
