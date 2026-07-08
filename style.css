@@ -12,15 +12,15 @@
   --grid-x: 50%;
   --grid-y: 40%;
 }
-
+ 
 * {
   box-sizing: border-box;
 }
-
+ 
 html, body {
   height: 100%;
 }
-
+ 
 body {
   margin: 0;
   min-height: 100vh;
@@ -34,7 +34,7 @@ body {
   position: relative;
   overflow-x: hidden;
 }
-
+ 
 .grid-overlay {
   position: fixed;
   inset: 0;
@@ -49,7 +49,7 @@ body {
   -webkit-mask-image: radial-gradient(220px circle at var(--grid-x) var(--grid-y), black 0%, rgba(0,0,0,0.5) 55%, transparent 100%);
   transition: background-position 0.6s cubic-bezier(0.16, 1, 0.3, 1), mask-position 0.6s ease;
 }
-
+ 
 .mouse-glow {
   position: fixed;
   inset: 0;
@@ -66,7 +66,7 @@ body {
   transition: background-position 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   filter: blur(8px);
 }
-
+ 
 .page {
   width: 100%;
   max-width: 620px;
@@ -76,7 +76,7 @@ body {
   position: relative;
   z-index: 1;
 }
-
+ 
 .console {
   width: 100%;
   background: var(--ink-panel);
@@ -86,7 +86,7 @@ body {
   overflow: hidden;
   position: relative;
 }
-
+ 
 .console__bar {
   display: flex;
   align-items: center;
@@ -98,11 +98,11 @@ body {
   touch-action: none;
   user-select: none;
 }
-
+ 
 .console__bar.is-dragging {
   cursor: grabbing;
 }
-
+ 
 .console.is-floating {
   position: fixed;
   margin: 0;
@@ -116,44 +116,44 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--line) var(--ink-panel);
 }
-
+ 
 .console.is-floating::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
-
+ 
 .console.is-floating::-webkit-scrollbar-track {
   background: var(--ink-panel);
 }
-
+ 
 .console.is-floating::-webkit-scrollbar-thumb {
   background: var(--line);
   border-radius: 6px;
   border: 2px solid var(--ink-panel);
 }
-
+ 
 .console.is-floating::-webkit-scrollbar-thumb:hover {
   background: var(--mint);
 }
-
+ 
 .console.is-floating::-webkit-scrollbar-corner {
   background: var(--ink-panel);
 }
-
+ 
 .console.is-floating .console__bar {
   border-bottom-color: var(--mint);
 }
-
+ 
 .resize-handle {
   position: absolute;
   z-index: 4;
   touch-action: none;
 }
-
+ 
 .console:not(.is-floating) .resize-handle {
   display: none;
 }
-
+ 
 .resize-handle--n,
 .resize-handle--s {
   left: 10px;
@@ -163,7 +163,7 @@ body {
 }
 .resize-handle--n { top: 0; }
 .resize-handle--s { bottom: 0; }
-
+ 
 .resize-handle--e,
 .resize-handle--w {
   top: 10px;
@@ -173,7 +173,7 @@ body {
 }
 .resize-handle--e { right: 0; }
 .resize-handle--w { left: 0; }
-
+ 
 .resize-handle--ne,
 .resize-handle--nw,
 .resize-handle--se,
@@ -185,37 +185,40 @@ body {
 .resize-handle--nw { top: 0; left: 0; cursor: nwse-resize; }
 .resize-handle--se { bottom: 0; right: 0; cursor: nwse-resize; }
 .resize-handle--sw { bottom: 0; left: 0; cursor: nesw-resize; }
-
+ 
 .taskbar {
   position: fixed;
-  top: 50%;
+  top: 0;
   right: 0;
+  height: 100vh;
   z-index: 60;
   display: flex;
   align-items: stretch;
-  transform: translate(calc(100% - 34px), -50%);
+  transform: translateX(calc(100% - 34px));
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
+ 
 .taskbar:hover,
 .taskbar:focus-within,
 .taskbar.is-open {
-  transform: translate(0, -50%);
+  transform: translateX(0);
 }
-
+ 
 .taskbar__panel {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
   min-width: 160px;
+  height: 100%;
   padding: 16px;
   background: var(--ink-panel);
   border: 1px solid var(--line);
   border-right: none;
-  border-radius: 10px 0 0 10px;
+  border-radius: 0;
   box-shadow: -24px 0 60px -24px rgba(0, 0, 0, 0.7);
 }
-
+ 
 .taskbar__link {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -229,13 +232,13 @@ body {
   text-align: center;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
-
+ 
 .taskbar__link:hover {
   color: var(--ink-deep);
   background: var(--mint);
   border-color: var(--mint);
 }
-
+ 
 .taskbar__handle {
   writing-mode: vertical-rl;
   text-orientation: mixed;
@@ -246,22 +249,24 @@ body {
   background: var(--ink-panel);
   border: 1px solid var(--line);
   border-right: none;
-  border-radius: 10px 0 0 10px;
+  border-radius: 0;
+  height: 100%;
   padding: 18px 9px;
   cursor: pointer;
   user-select: none;
   transition: color 0.15s ease;
 }
-
+ 
 .taskbar__handle:hover {
   color: var(--mint);
 }
-
+ 
 @media (max-width: 640px) {
   .taskbar {
     top: auto;
     bottom: 0;
     right: 16px;
+    height: auto;
     transform: translate(0, calc(100% - 34px));
   }
   .taskbar:hover,
@@ -275,16 +280,21 @@ body {
     border-right: 1px solid var(--line);
     border-bottom: none;
   }
+  .taskbar__panel {
+    height: auto;
+    justify-content: flex-start;
+  }
   .taskbar__handle {
     writing-mode: horizontal-tb;
     text-align: center;
+    height: auto;
   }
 }
-
+ 
 .games-empty {
   padding: 8px 0 22px;
 }
-
+ 
 .games-empty__headline {
   font-family: var(--font-display);
   font-size: clamp(24px, 5vw, 32px);
@@ -292,17 +302,17 @@ body {
   color: var(--mint);
   text-transform: lowercase;
 }
-
+ 
 .games-empty__sub {
   margin: 0;
   font-size: 13px;
   color: var(--text-dim);
 }
-
+ 
 body.is-interacting {
   user-select: none;
 }
-
+ 
 .dot {
   width: 10px;
   height: 10px;
@@ -313,22 +323,22 @@ body.is-interacting {
 .dot--red { background: var(--coral); }
 .dot--amber { background: var(--amber); }
 .dot--green { background: var(--mint); }
-
+ 
 .console__title {
   margin-left: 8px;
   font-size: 12px;
   color: var(--text-dim);
   letter-spacing: 0.02em;
 }
-
+ 
 .console__body {
   padding: 28px 28px 8px;
 }
-
+ 
 .console__body:last-child {
   padding-bottom: 28px;
 }
-
+ 
 .console__line {
   margin: 0 0 18px;
   font-size: 13px;
@@ -336,7 +346,7 @@ body.is-interacting {
 .console__line--muted {
   color: var(--text-dim);
 }
-
+ 
 .checklist {
   list-style: none;
   margin: 0 0 24px;
@@ -345,7 +355,7 @@ body.is-interacting {
   flex-direction: column;
   gap: 10px;
 }
-
+ 
 .checklist__item {
   font-size: 13px;
   color: var(--text-dim);
@@ -354,31 +364,31 @@ body.is-interacting {
   opacity: 0.45;
   transition: opacity 0.3s ease, color 0.3s ease;
 }
-
+ 
 .checklist__item::before {
   content: "○";
   position: absolute;
   left: 0;
   color: var(--text-dim);
 }
-
+ 
 .checklist__item.is-done {
   opacity: 1;
   color: var(--paper);
 }
-
+ 
 .checklist__item.is-done::before {
   content: "✓";
   color: var(--mint);
 }
-
+ 
 .result {
   border-top: 1px dashed var(--line);
   border-bottom: 1px dashed var(--line);
   padding: 22px 0;
   margin-bottom: 22px;
 }
-
+ 
 .result__headline {
   font-family: var(--font-display);
   font-size: clamp(28px, 6vw, 40px);
@@ -388,17 +398,17 @@ body.is-interacting {
   transition: color 0.4s ease;
   text-transform: lowercase;
 }
-
+ 
 .result__headline.is-live {
   color: var(--mint);
 }
-
+ 
 .result__sub {
   margin: 0;
   font-size: 13px;
   color: var(--text-dim);
 }
-
+ 
 .meta {
   margin: 0 0 26px;
   display: grid;
@@ -407,11 +417,11 @@ body.is-interacting {
   column-gap: 18px;
   font-size: 12px;
 }
-
+ 
 .meta__row {
   display: contents;
 }
-
+ 
 .meta dt {
   color: var(--text-dim);
   text-transform: uppercase;
@@ -419,13 +429,13 @@ body.is-interacting {
   font-size: 10px;
   align-self: center;
 }
-
+ 
 .meta dd {
   margin: 0;
   color: var(--paper);
   word-break: break-word;
 }
-
+ 
 .rerun {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -438,38 +448,38 @@ body.is-interacting {
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-
+ 
 .rerun:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px -8px rgba(127, 231, 196, 0.6);
 }
-
+ 
 .rerun:focus-visible,
 .rerun:focus {
   outline: 2px solid var(--paper);
   outline-offset: 2px;
 }
-
+ 
 .console__footer {
   padding: 14px 28px 20px;
   font-size: 11px;
   color: var(--text-dim);
   border-top: 1px solid var(--line);
 }
-
+ 
 .converter {
   display: flex;
   flex-direction: column;
   gap: 18px;
   margin-bottom: 22px;
 }
-
+ 
 .converter__tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-
+ 
 .converter__tab,
 .converter__format-btn {
   font-family: var(--font-mono);
@@ -483,40 +493,40 @@ body.is-interacting {
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
-
+ 
 .converter__tab:hover,
 .converter__format-btn:hover {
   color: var(--paper);
   border-color: var(--mint);
 }
-
+ 
 .converter__tab.is-active,
 .converter__format-btn.is-active {
   color: var(--ink-deep);
   background: var(--mint);
   border-color: var(--mint);
 }
-
+ 
 .converter__tabs--format {
   margin-top: -4px;
 }
-
+ 
 .converter__format-btn {
   font-size: 10px;
   padding: 5px 10px;
   opacity: 0.85;
 }
-
+ 
 .converter__format-btn.is-active {
   opacity: 1;
 }
-
+ 
 .converter__row {
   display: flex;
   align-items: center;
   gap: 12px;
 }
-
+ 
 .converter__field {
   flex: 1;
   display: flex;
@@ -524,7 +534,7 @@ body.is-interacting {
   gap: 8px;
   min-width: 0;
 }
-
+ 
 .converter__input {
   font-family: var(--font-mono);
   font-size: 16px;
@@ -536,17 +546,17 @@ body.is-interacting {
   width: 100%;
   min-width: 0;
 }
-
+ 
 .converter__input:focus,
 .converter__input:focus-visible {
   outline: none;
   border-color: var(--mint);
 }
-
+ 
 .converter__input[readonly] {
   color: var(--mint);
 }
-
+ 
 .converter__select {
   font-family: var(--font-mono);
   font-size: 12px;
@@ -557,7 +567,7 @@ body.is-interacting {
   padding: 8px 10px;
   width: 100%;
 }
-
+ 
 .converter__swap {
   flex-shrink: 0;
   width: 36px;
@@ -571,19 +581,19 @@ body.is-interacting {
   cursor: pointer;
   transition: transform 0.2s ease, color 0.15s ease, border-color 0.15s ease;
 }
-
+ 
 .converter__swap:hover {
   color: var(--mint);
   border-color: var(--mint);
   transform: rotate(180deg);
 }
-
+ 
 .converter__note {
   margin: 0;
   font-size: 11px;
   color: var(--text-dim);
 }
-
+ 
 @media (max-width: 420px) {
   .converter__row {
     flex-direction: column;
@@ -598,7 +608,7 @@ body.is-interacting {
     transform: rotate(270deg);
   }
 }
-
+ 
 @media (prefers-reduced-motion: reduce) {
   .checklist__item,
   .result__headline,
@@ -606,7 +616,7 @@ body.is-interacting {
     transition: none;
   }
 }
-
+ 
 @media (max-width: 420px) {
   .console__body {
     padding: 22px 18px 6px;
@@ -615,3 +625,4 @@ body.is-interacting {
     padding: 12px 18px 18px;
   }
 }
+ 
