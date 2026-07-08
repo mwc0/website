@@ -65,12 +65,19 @@
   </main>
   </div>
 
-  <nav class="taskbar" id="taskbar" aria-label="Site navigation">
-    <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false">menu</button>
-    <div class="taskbar__panel">
-      <a class="taskbar__link" href="games/">games</a>
-    </div>
-  </nav>
+  <div class="side-nav">
+    <div class="side-nav__trigger" aria-hidden="true"></div>
+    <nav class="taskbar" id="taskbar" aria-label="Site navigation">
+      <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+        <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="taskbar__panel">
+        <a class="taskbar__link" href="games/">games</a>
+      </div>
+    </nav>
+  </div>
 
   <script src="common.js?v=1"></script>
   <script src="script.js?v=6"></script>
