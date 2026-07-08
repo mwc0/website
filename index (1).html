@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>matthew.quest — games</title>
+<meta name="description" content="Games on matthew.quest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="mouse-glow" aria-hidden="true"></div>
+
+  <div class="page">
+  <main class="console">
+    <header class="console__bar" title="Drag to move">
+      <span class="dot dot--red"></span>
+      <span class="dot dot--amber"></span>
+      <span class="dot dot--green"></span>
+      <span class="console__title">games.sh</span>
+    </header>
+
+    <div class="console__body">
+      <p class="console__line console__line--muted">$ ls games/</p>
+
+      <div class="games-empty">
+        <h1 class="games-empty__headline">nothing here yet</h1>
+        <p class="games-empty__sub">This corner of matthew.quest is reserved for games — check back soon.</p>
+      </div>
+    </div>
+
+    <footer class="console__footer">
+      drag this window around, or resize it from any edge — it's the same kind as the one on the homepage.
+    </footer>
+  </main>
+  </div>
+
+  <nav class="taskbar" id="taskbar" aria-label="Site navigation">
+    <div class="taskbar__panel">
+      <a class="taskbar__link" href="../">home</a>
+    </div>
+    <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false">menu</button>
+  </nav>
+
+  <script src="../common.js?v=1"></script>
+</body>
+</html>
