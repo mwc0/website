@@ -230,6 +230,17 @@ body {
   border-right: none;
   border-radius: 10px 0 0 10px;
   box-shadow: -24px 0 60px -24px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.taskbar-hover-zone:hover ~ .taskbar .taskbar__panel,
+.taskbar:hover .taskbar__panel,
+.taskbar:focus-within .taskbar__panel,
+.taskbar.is-open .taskbar__panel {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .taskbar__link {
