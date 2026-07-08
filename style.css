@@ -107,6 +107,16 @@ body {
   position: fixed;
   margin: 0;
   box-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.75);
+  resize: both;
+  overflow: auto;
+  min-width: 300px;
+  min-height: 220px;
+  max-width: 92vw;
+  max-height: 90vh;
+}
+
+.console.is-floating::-webkit-resizer {
+  background: var(--ink-panel);
 }
 
 .console.is-floating .console__bar {
