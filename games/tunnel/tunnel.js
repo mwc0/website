@@ -13,7 +13,7 @@
 
   const W = canvas.width;
   const H = canvas.height;
-  const CELL = 50;
+  const CELL = 60;
   const WALL_THICK = 34;
   const PLAYER_SIZE = 22;
   const PLAYER_SCREEN_X = 110;
@@ -57,11 +57,11 @@
 
   function generateCell() {
     const diff = currentDifficulty();
-    const bothGapChance = 0.04 + diff * 0.07; // up to ~11%
-    const gapChance = 0.16 + diff * 0.08; // up to ~24% each side
+    const bothGapChance = 0.03 + diff * 0.05; // up to ~8%
+    const gapChance = 0.12 + diff * 0.06; // up to ~18% each side
 
     if (sinceBothGap < 1) {
-      // force a safe cell right after a full gap so it's always landable
+      // force a safe cell right after ANY gap so gaps never chain together
       sinceBothGap += 1;
       lastCellType = 'open';
       return 'open';
@@ -74,10 +74,10 @@
       sinceBothGap = 0;
     } else if (roll < bothGapChance + gapChance) {
       type = 'floorGap';
-      sinceBothGap += 1;
+      sinceBothGap = 0;
     } else if (roll < bothGapChance + gapChance * 2) {
       type = 'ceilingGap';
-      sinceBothGap += 1;
+      sinceBothGap = 0;
     } else {
       type = 'open';
       sinceBothGap += 1;
@@ -121,7 +121,7 @@
 
   function startJump() {
     if (airborne || !alive) return;
-    airborneTotal = Math.max(10, Math.round((CELL * 1.35) / speed));
+    airborneTotal = Math.max(10, Math.round((CELL * 1.7) / speed));
     airborneFrames = airborneTotal;
     airborne = true;
   }
