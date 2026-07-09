@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>matthew.quest — driftwalk</title>
+<meta name="description" content="Play Driftwalk, an endless tunnel runner, on matthew.quest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="../../images/favicon.ico">
+<link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="mouse-glow" aria-hidden="true"></div>
+
+  <div class="page">
+  <main class="console">
+    <header class="console__bar" title="Drag to move">
+      <span class="dot dot--red"></span>
+      <span class="dot dot--amber"></span>
+      <span class="dot dot--green"></span>
+      <span class="console__title">driftwalk.sh</span>
+    </header>
+
+    <div class="console__body">
+      <p class="console__line console__line--muted">$ ./driftwalk --run</p>
+
+      <div class="tunnel">
+        <div class="game-hud">
+          <span class="game-stat">distance <strong id="tunnelScore">0</strong></span>
+          <span class="game-stat">best <strong id="tunnelBest">0</strong></span>
+        </div>
+
+        <div class="tunnel__stage">
+          <canvas id="tunnelCanvas" width="480" height="260" aria-label="Driftwalk game board"></canvas>
+          <div class="game-overlay" id="tunnelOverlay">
+            <p class="game-overlay__title" id="tunnelOverlayTitle">driftwalk</p>
+            <p class="game-overlay__sub" id="tunnelOverlaySub">jump gaps, flip gravity to switch floor and ceiling — press any key to start</p>
+          </div>
+        </div>
+
+        <div class="tunnel__controls">
+          <button class="tunnel__btn" id="tunnelJumpBtn" type="button">jump</button>
+          <button class="tunnel__btn" id="tunnelFlipBtn" type="button">flip</button>
+        </div>
+
+        <p class="game-hint">space / w / up = jump · s / down = flip gravity</p>
+      </div>
+    </div>
+  </main>
+  </div>
+
+  <div class="side-nav">
+    <div class="side-nav__trigger" aria-hidden="true"></div>
+    <nav class="taskbar" id="taskbar" aria-label="Site navigation">
+      <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+        <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="taskbar__panel">
+        <a class="taskbar__link" href="../">games</a>
+        <a class="taskbar__link" href="../../">home</a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="../../common.js?v=1"></script>
+  <script src="tunnel.js?v=1"></script>
+</body>
+</html>
