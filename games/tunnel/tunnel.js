@@ -13,7 +13,7 @@
 
   const W = canvas.width;
   const H = canvas.height;
-  const CELL = 60;
+  const CELL = 50;
   const WALL_THICK = 34;
   const PLAYER_SIZE = 22;
   const PLAYER_SCREEN_X = 110;
