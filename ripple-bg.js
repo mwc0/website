@@ -18,8 +18,8 @@
 
   // Domain-warped fbm (in the spirit of iq's "Fractal Brownian Motion" warp
   // technique) driving a black -> violet -> blue -> pink -> white palette,
-  // plus a drifting vortex swirl and a couple of red filament layers to
-  // match the reference image's tendrils.
+  // plus a gentle *bounded* swirl/wander and a couple of red filament
+  // layers to match the reference image's tendrils.
   const FRAG_SRC = `
     precision highp float;
     uniform vec2 u_resolution;
@@ -50,7 +50,7 @@
     float fbm(vec2 p) {
       float v = 0.0;
       float amp = 0.55;
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 5; i++) {
         v += amp * noise(p);
         p = rot2(0.6) * p * 2.03 + vec2(1.3, -0.7);
         amp *= 0.55;
@@ -63,19 +63,23 @@
       vec2 uv = (gl_FragCoord.xy - 0.5 * res) / res.y;
       float t = u_time;
 
+      // Bounded wander instead of an unbounded linear pan -- keeps the
+      // scene "breathing" in place rather than continuously flying/zooming
+      // in one direction forever.
       vec2 center = vec2(-0.16, -0.10) + 0.14 * vec2(cos(t * 0.045), sin(t * 0.06));
       vec2 toC = uv - center;
       float d = length(toC);
-      float swirlAmt = 3.1 * exp(-d * d * 1.5);
-      float ang = swirlAmt + 0.18 * sin(t * 0.09);
+      float swirlAmt = 1.8 * exp(-d * d * 2.2);
+      float ang = swirlAmt + 0.15 * sin(t * 0.08);
       vec2 swirled = center + rot2(ang) * toC;
 
-      vec2 p = swirled * 1.55 + vec2(0.14 * t, -0.09 * t);
+      vec2 drift = 0.55 * vec2(cos(t * 0.05), sin(t * 0.037));
+      vec2 p = swirled * 1.55 + drift;
 
       vec2 q = vec2(fbm(p), fbm(p + vec2(5.2, 1.3)));
       vec2 r = vec2(
-        fbm(p + 3.4 * q + vec2(1.7, 9.2) + 0.17 * t),
-        fbm(p + 3.4 * q + vec2(8.3, 2.8) - 0.12 * t)
+        fbm(p + 3.4 * q + vec2(1.7, 9.2) + 0.06 * sin(t * 0.2)),
+        fbm(p + 3.4 * q + vec2(8.3, 2.8) - 0.06 * cos(t * 0.17))
       );
       float f = fbm(p + 3.6 * r);
 
@@ -148,21 +152,38 @@
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const speed = prefersReducedMotion ? 0.06 : 1.0;
-  const dprCap = 1.5;
+
+  // Render at a fraction of the CSS size and let the GPU/CSS upscale it --
+  // this is a soft glow effect so full native-resolution sharpness isn't
+  // needed, and it noticeably cuts fragment-shader cost.
+  const DPR_CAP = 1.25;
+  const RENDER_SCALE = 0.75;
 
   let width = 0, height = 0;
+  let resizePending = false;
 
-  function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
-    const w = Math.max(1, Math.round(canvas.clientWidth * dpr));
-    const h = Math.max(1, Math.round(canvas.clientHeight * dpr));
-    if (w !== width || h !== height) {
-      width = w;
-      height = h;
-      canvas.width = w;
-      canvas.height = h;
-      gl.viewport(0, 0, w, h);
-    }
+  function applyResize() {
+    resizePending = false;
+    const dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+    const w = Math.max(1, Math.round(canvas.clientWidth * dpr * RENDER_SCALE));
+    const h = Math.max(1, Math.round(canvas.clientHeight * dpr * RENDER_SCALE));
+    if (w === width && h === height) return;
+    width = w;
+    height = h;
+    canvas.width = w;
+    canvas.height = h;
+    gl.viewport(0, 0, w, h);
+  }
+
+  function scheduleResize() {
+    if (resizePending) return;
+    resizePending = true;
+    requestAnimationFrame(applyResize);
+  }
+
+  window.addEventListener('resize', scheduleResize);
+  if (window.ResizeObserver) {
+    new ResizeObserver(scheduleResize).observe(canvas);
   }
 
   let elapsed = 0;
@@ -175,7 +196,6 @@
     lastTs = ts;
     elapsed += dt * speed;
 
-    resize();
     gl.uniform2f(uRes, width, height);
     gl.uniform1f(uTime, elapsed);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -202,8 +222,6 @@
     else start();
   });
 
-  window.addEventListener('resize', resize);
-
-  resize();
+  applyResize();
   start();
 })();
