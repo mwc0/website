@@ -9,8 +9,9 @@
   --text-dim: #9a8fc9;
   --wordle-correct: #5fb968;
   --wordle-present: #e2c14c;
-  --ripple-pink: #ff6fb0;
-  --ripple-blue: #5fc9ff;
+  --ripple-pink: #ff5fae;
+  --ripple-blue: #5f8bff;
+  --ripple-violet: #a24bef;
   --font-display: 'Space Grotesk', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --grid-x: 50%;
@@ -32,22 +33,18 @@ body {
   align-items: center;
   justify-content: center;
   padding: 32px 16px;
-  background:
-    radial-gradient(ellipse 70% 60% at 15% 20%, rgba(255, 111, 176, 0.16), transparent 60%),
-    radial-gradient(ellipse 70% 60% at 85% 80%, rgba(95, 201, 255, 0.16), transparent 60%),
-    var(--ink-deep);
-  background-size: 200% 200%, 200% 200%, 100% 100%;
-  background-position: 0% 0%, 100% 100%, center;
-  animation: bgDrift 18s ease-in-out infinite alternate;
+  background: var(--ink-deep);
   color: var(--paper);
   font-family: var(--font-mono);
   position: relative;
   overflow-x: hidden;
 }
 
-@keyframes bgDrift {
-  0% { background-position: 0% 0%, 100% 100%, center; }
-  100% { background-position: 40% 60%, 60% 40%, center; }
+.ripple-svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
 }
 
 .ripple-layer {
@@ -56,46 +53,74 @@ body {
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  background: var(--ink-deep);
+  filter: url(#rippleDistort) saturate(1.5) brightness(1.05);
 }
 
-.ripple-ring {
+.ripple-blob {
   position: absolute;
-  top: var(--grid-y);
-  left: var(--grid-x);
-  width: 48px;
-  height: 48px;
-  margin: -24px 0 0 -24px;
   border-radius: 50%;
-  border: 3px solid var(--ripple-pink);
-  box-shadow: 0 0 24px 2px rgba(255, 111, 176, 0.45);
-  opacity: 0;
-  transform: scale(0);
-  transition: top 0.6s cubic-bezier(0.16, 1, 0.3, 1), left 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: rippleGrow 6s ease-out infinite;
+  filter: blur(50px);
+  mix-blend-mode: screen;
+  will-change: transform;
 }
 
-.ripple-ring:nth-child(2) {
-  border-color: var(--ripple-blue);
-  box-shadow: 0 0 24px 2px rgba(95, 201, 255, 0.45);
-  animation-delay: 1.5s;
+.ripple-blob--1 {
+  width: 62vw;
+  height: 62vw;
+  top: -14%;
+  left: -12%;
+  background: radial-gradient(circle, var(--ripple-pink), transparent 68%);
+  animation: rippleFloat1 24s ease-in-out infinite;
 }
 
-.ripple-ring:nth-child(3) {
-  border-color: var(--ripple-pink);
-  box-shadow: 0 0 24px 2px rgba(255, 111, 176, 0.45);
-  animation-delay: 3s;
+.ripple-blob--2 {
+  width: 58vw;
+  height: 58vw;
+  bottom: -16%;
+  right: -10%;
+  background: radial-gradient(circle, var(--ripple-blue), transparent 68%);
+  animation: rippleFloat2 29s ease-in-out infinite;
 }
 
-.ripple-ring:nth-child(4) {
-  border-color: var(--ripple-blue);
-  box-shadow: 0 0 24px 2px rgba(95, 201, 255, 0.45);
-  animation-delay: 4.5s;
+.ripple-blob--3 {
+  width: 46vw;
+  height: 46vw;
+  top: 18%;
+  right: 8%;
+  background: radial-gradient(circle, var(--ripple-violet), transparent 68%);
+  animation: rippleFloat3 20s ease-in-out infinite;
 }
 
-@keyframes rippleGrow {
-  0% { transform: scale(0); opacity: 0.9; }
-  70% { opacity: 0.3; }
-  100% { transform: scale(22); opacity: 0; }
+.ripple-blob--4 {
+  width: 50vw;
+  height: 50vw;
+  bottom: 6%;
+  left: 12%;
+  background: radial-gradient(circle, var(--ripple-pink), transparent 68%);
+  animation: rippleFloat4 26s ease-in-out infinite;
+}
+
+@keyframes rippleFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(8vw, -6vh) scale(1.15); }
+  66% { transform: translate(-5vw, 7vh) scale(0.9); }
+}
+
+@keyframes rippleFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(-7vw, 6vh) scale(0.92); }
+  66% { transform: translate(6vw, -8vh) scale(1.18); }
+}
+
+@keyframes rippleFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-9vw, 5vh) scale(1.1); }
+}
+
+@keyframes rippleFloat4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(7vw, -5vh) scale(1.08); }
 }
 
 .grid-overlay {
@@ -999,8 +1024,7 @@ body.is-interacting {
   .rerun,
   .taskbar,
   .taskbar__arrow,
-  body,
-  .ripple-ring {
+  .ripple-blob {
     transition: none;
     animation: none;
   }
