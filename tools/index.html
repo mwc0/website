@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>matthew.quest — tools</title>
+<meta name="description" content="Unit and currency converter on matthew.quest.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="mouse-glow" aria-hidden="true"></div>
+
+  <div class="page">
+  <main class="console">
+    <header class="console__bar" title="Drag to move">
+      <span class="dot dot--red"></span>
+      <span class="dot dot--amber"></span>
+      <span class="dot dot--green"></span>
+      <span class="console__title">convert.sh</span>
+    </header>
+
+    <div class="console__body">
+      <p class="console__line console__line--muted">$ convert --category length</p>
+
+      <div class="converter">
+        <div class="converter__tabs" role="tablist" aria-label="Converter category">
+          <button class="converter__tab is-active" data-category="length" type="button">length</button>
+          <button class="converter__tab" data-category="weight" type="button">weight</button>
+          <button class="converter__tab" data-category="temperature" type="button">temp</button>
+          <button class="converter__tab" data-category="currency" type="button">currency</button>
+        </div>
+
+        <div class="converter__row">
+          <div class="converter__field">
+            <input class="converter__input" id="fromValue" type="number" inputmode="decimal" value="1" />
+            <select class="converter__select" id="fromUnit" aria-label="Convert from"></select>
+          </div>
+
+          <button class="converter__swap" id="swapUnits" type="button" aria-label="Swap units">⇄</button>
+
+          <div class="converter__field">
+            <input class="converter__input" id="toValue" type="text" readonly aria-label="Converted result" />
+            <select class="converter__select" id="toUnit" aria-label="Convert to"></select>
+          </div>
+        </div>
+
+        <div class="converter__tabs converter__tabs--format" role="tablist" aria-label="Number format">
+          <button class="converter__format-btn is-active" data-format="decimal" type="button">decimal</button>
+          <button class="converter__format-btn" data-format="standard" type="button">standard form</button>
+        </div>
+
+        <p class="converter__note" id="converterNote">1 metre = 3.28084 feet</p>
+      </div>
+    </div>
+
+    <footer class="console__footer">
+      length, weight, and temperature convert instantly. currency pulls live rates when it can reach the network.
+    </footer>
+  </main>
+  </div>
+
+  <div class="side-nav">
+    <div class="side-nav__trigger" aria-hidden="true"></div>
+    <nav class="taskbar" id="taskbar" aria-label="Site navigation">
+      <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+        <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="taskbar__panel">
+        <a class="taskbar__link" href="../games/">games</a>
+        <a class="taskbar__link" href="../">home</a>
+      </div>
+    </nav>
+  </div>
+
+  <script src="../common.js?v=1"></script>
+  <script src="../script.js?v=6"></script>
+</body>
+</html>
