@@ -650,6 +650,43 @@ body.is-interacting {
   user-select: none;
 }
 
+.side-nav--right {
+  left: auto;
+  right: 0;
+}
+
+.side-nav--right .side-nav__trigger {
+  left: auto;
+  right: 0;
+}
+
+.side-nav--right .taskbar {
+  flex-direction: row-reverse;
+  transform: translateX(calc(100% - 40px));
+}
+
+.side-nav--right .taskbar__handle {
+  border-radius: 10px 0 0 10px;
+  border-left: 1px solid var(--line);
+  border-right: none;
+}
+
+.side-nav--right .taskbar__panel {
+  border-radius: 10px 0 0 10px;
+  border-left: 1px solid var(--line);
+  border-right: none;
+  box-shadow: -24px 0 60px -24px rgba(0, 0, 0, 0.7);
+}
+
+.side-nav--right .taskbar__arrow {
+  transform: rotate(180deg);
+}
+
+.side-nav--right:hover .taskbar__arrow,
+.side-nav--right .taskbar.is-open .taskbar__arrow {
+  transform: rotate(0deg);
+}
+
 .dot {
   width: 10px;
   height: 10px;
