@@ -202,7 +202,7 @@ body {
 .resize-handle--se { bottom: 0; right: 0; cursor: nwse-resize; }
 .resize-handle--sw { bottom: 0; left: 0; cursor: nesw-resize; }
 
-/* ---- Side taskbar: arrow tab on the left edge, hover to reveal ---- */
+/* ---- Side taskbar: cap + arrow-handle cluster docked to the edge ---- */
 
 .side-nav {
   position: fixed;
@@ -211,8 +211,14 @@ body {
   height: 100%;
   z-index: 60;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: 22vh;
   pointer-events: none;
+}
+
+.side-nav--right {
+  left: auto;
+  right: 0;
 }
 
 .side-nav__trigger {
@@ -220,8 +226,13 @@ body {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 96px;
+  width: 84px;
   pointer-events: auto;
+}
+
+.side-nav--right .side-nav__trigger {
+  left: auto;
+  right: 0;
 }
 
 @media (hover: none) {
@@ -233,32 +244,60 @@ body {
 .taskbar {
   position: relative;
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   pointer-events: auto;
-  transform: translateX(calc(-100% + 40px));
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.side-nav:hover .taskbar,
-.side-nav:focus-within .taskbar,
-.taskbar.is-open {
-  transform: translateX(0);
+.side-nav--right .taskbar {
+  flex-direction: row-reverse;
+}
+
+.taskbar__cluster {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.taskbar__mark {
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: var(--ink-panel);
+  border: 1px solid var(--line);
+  border-left: none;
+  border-radius: 0 8px 0 0;
 }
 
 .taskbar__handle {
+  position: relative;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 40px;
+  width: 30px;
+  height: 42px;
   padding: 0;
   color: var(--text-dim);
   background: var(--ink-panel);
   border: 1px solid var(--line);
   border-left: none;
-  border-radius: 0 10px 10px 0;
+  border-top: none;
+  border-radius: 0 0 8px 0;
   cursor: pointer;
   transition: color 0.15s ease;
+}
+
+.side-nav--right .taskbar__mark {
+  border-left: 1px solid var(--line);
+  border-right: none;
+  border-radius: 8px 0 0 0;
+}
+
+.side-nav--right .taskbar__handle {
+  border-left: 1px solid var(--line);
+  border-right: none;
+  border-radius: 0 0 0 8px;
 }
 
 .taskbar__handle:hover {
@@ -274,17 +313,48 @@ body {
   transform: rotate(180deg);
 }
 
+.side-nav--right .taskbar__arrow {
+  transform: rotate(180deg);
+}
+
+.side-nav--right:hover .taskbar__arrow,
+.side-nav--right .taskbar.is-open .taskbar__arrow {
+  transform: rotate(0deg);
+}
+
 .taskbar__panel {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 160px;
+  min-width: 150px;
   padding: 16px;
   background: var(--ink-panel);
   border: 1px solid var(--line);
-  border-left: none;
   border-radius: 0 10px 10px 0;
   box-shadow: 24px 0 60px -24px rgba(0, 0, 0, 0.7);
+  margin-left: -1px;
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.side-nav:hover .taskbar__panel,
+.side-nav:focus-within .taskbar__panel,
+.taskbar.is-open .taskbar__panel {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.side-nav--right .taskbar__panel {
+  border-radius: 10px 0 0 10px;
+  margin-left: 0;
+  margin-right: -1px;
+  box-shadow: -24px 0 60px -24px rgba(0, 0, 0, 0.7);
+  transform: translateX(100%);
 }
 
 .taskbar__link {
@@ -650,43 +720,6 @@ body.is-interacting {
   user-select: none;
 }
 
-.side-nav--right {
-  left: auto;
-  right: 0;
-}
-
-.side-nav--right .side-nav__trigger {
-  left: auto;
-  right: 0;
-}
-
-.side-nav--right .taskbar {
-  flex-direction: row-reverse;
-  transform: translateX(calc(100% - 40px));
-}
-
-.side-nav--right .taskbar__handle {
-  border-radius: 10px 0 0 10px;
-  border-left: 1px solid var(--line);
-  border-right: none;
-}
-
-.side-nav--right .taskbar__panel {
-  border-radius: 10px 0 0 10px;
-  border-left: 1px solid var(--line);
-  border-right: none;
-  box-shadow: -24px 0 60px -24px rgba(0, 0, 0, 0.7);
-}
-
-.side-nav--right .taskbar__arrow {
-  transform: rotate(180deg);
-}
-
-.side-nav--right:hover .taskbar__arrow,
-.side-nav--right .taskbar.is-open .taskbar__arrow {
-  transform: rotate(0deg);
-}
-
 .dot {
   width: 10px;
   height: 10px;
@@ -988,7 +1021,8 @@ body.is-interacting {
   .result__headline,
   .rerun,
   .taskbar,
-  .taskbar__arrow {
+  .taskbar__arrow,
+  .taskbar__panel {
     transition: none;
     animation: none;
   }
