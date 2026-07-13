@@ -537,7 +537,14 @@ body {
 }
 
 .wordle__tile {
+  /* aspect-ratio keeps tiles square on browsers that support it (Chrome 88+,
+     Firefox 89+, Safari 15+). Older/locked-down browsers silently ignore
+     aspect-ratio, which collapses the tile (and the whole board) to zero
+     height since nothing else sets a height. --wordle-tile-size is set from
+     JS (see sizeTiles() in wordle.js) as a pixel fallback so the board
+     always renders even without aspect-ratio support. */
   aspect-ratio: 1 / 1;
+  height: var(--wordle-tile-size, auto);
   display: flex;
   align-items: center;
   justify-content: center;
