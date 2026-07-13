@@ -1551,6 +1551,18 @@
     }
   }
 
+  function sizeTiles() {
+    // Fallback for browsers without aspect-ratio support: measure the
+    // rendered tile width and set it as an explicit height via a CSS
+    // variable (see .wordle__tile in style.css). No-op / harmless on
+    // browsers where aspect-ratio already works.
+    if (!tiles.length || !tiles[0].length) return;
+    const width = tiles[0][0].getBoundingClientRect().width;
+    if (width > 0) {
+      boardEl.style.setProperty('--wordle-tile-size', `${width}px`);
+    }
+  }
+
   const KEY_ROWS = [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
@@ -1744,9 +1756,12 @@
     locked = false;
     setMessage('');
     buildBoard();
+    sizeTiles();
     resetKeyboardColors();
     overlay.classList.add('is-hidden');
   }
+
+  window.addEventListener('resize', sizeTiles);
 
   window.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -1777,6 +1792,7 @@
 
   buildKeyboard();
   buildBoard();
+  sizeTiles();
   locked = true;
   overlayTitle.textContent = 'wordle unlimited';
   overlaySub.textContent = 'guess the 5-letter word — press enter to begin';
