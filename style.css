@@ -202,7 +202,7 @@ body {
 .resize-handle--se { bottom: 0; right: 0; cursor: nwse-resize; }
 .resize-handle--sw { bottom: 0; left: 0; cursor: nesw-resize; }
 
-/* ---- Side taskbar: cap + arrow-handle cluster docked to the edge ---- */
+/* ---- Side taskbar: a persistent tab (cap + arrow + long tail) docked to the edge ---- */
 
 .side-nav {
   position: fixed;
@@ -211,7 +211,7 @@ body {
   height: 100%;
   z-index: 60;
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   padding-top: 22vh;
   pointer-events: none;
 }
@@ -256,10 +256,12 @@ body {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  align-self: stretch;
 }
 
 .taskbar__mark {
   display: block;
+  flex-shrink: 0;
   width: 30px;
   height: 30px;
   background: var(--ink-panel);
@@ -283,9 +285,22 @@ body {
   border: 1px solid var(--line);
   border-left: none;
   border-top: none;
-  border-radius: 0 0 8px 0;
+  border-bottom: none;
+  border-radius: 0;
   cursor: pointer;
   transition: color 0.15s ease;
+}
+
+.taskbar__tail {
+  flex: 1;
+  min-height: 40px;
+  width: 30px;
+  background: var(--ink-panel);
+  border: 1px solid var(--line);
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 8px 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .side-nav--right .taskbar__mark {
@@ -295,6 +310,12 @@ body {
 }
 
 .side-nav--right .taskbar__handle {
+  border-left: 1px solid var(--line);
+  border-right: none;
+  border-radius: 0;
+}
+
+.side-nav--right .taskbar__tail {
   border-left: 1px solid var(--line);
   border-right: none;
   border-radius: 0 0 0 8px;
@@ -501,7 +522,7 @@ body {
 .wordle {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 22px;
 }
 
@@ -512,9 +533,9 @@ body {
 .wordle__board {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   width: 100%;
-  max-width: 260px;
+  max-width: 300px;
   margin: 0 auto;
 }
 
@@ -537,14 +558,7 @@ body {
 }
 
 .wordle__tile {
-  /* aspect-ratio keeps tiles square on browsers that support it (Chrome 88+,
-     Firefox 89+, Safari 15+). Older/locked-down browsers silently ignore
-     aspect-ratio, which collapses the tile (and the whole board) to zero
-     height since nothing else sets a height. --wordle-tile-size is set from
-     JS (see sizeTiles() in wordle.js) as a pixel fallback so the board
-     always renders even without aspect-ratio support. */
   aspect-ratio: 1 / 1;
-  height: var(--wordle-tile-size, auto);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -607,16 +621,16 @@ body {
 
 .wordle__key {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.02em;
   color: var(--paper);
   background: rgba(61, 47, 122, 0.5);
   border: none;
   border-radius: 5px;
-  padding: 9px 0;
+  padding: 12px 0;
   flex: 1;
   min-width: 0;
-  max-width: 32px;
+  max-width: 38px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
@@ -652,11 +666,11 @@ body {
 
 @media (max-width: 420px) {
   .wordle__key {
-    padding: 8px 0;
-    max-width: 28px;
+    padding: 10px 0;
+    max-width: 32px;
   }
   .wordle__key--wide {
-    max-width: 40px;
+    max-width: 46px;
   }
 }
 
@@ -1043,4 +1057,3 @@ body.is-interacting {
     padding: 12px 18px 18px;
   }
 }
-
