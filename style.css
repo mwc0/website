@@ -501,7 +501,7 @@ body {
 .wordle {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 22px;
 }
 
@@ -512,9 +512,9 @@ body {
 .wordle__board {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   width: 100%;
-  max-width: 300px;
+  max-width: 260px;
   margin: 0 auto;
 }
 
@@ -607,16 +607,16 @@ body {
 
 .wordle__key {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
   letter-spacing: 0.02em;
   color: var(--paper);
   background: rgba(61, 47, 122, 0.5);
   border: none;
   border-radius: 5px;
-  padding: 12px 0;
+  padding: 9px 0;
   flex: 1;
   min-width: 0;
-  max-width: 38px;
+  max-width: 32px;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
 }
@@ -652,11 +652,11 @@ body {
 
 @media (max-width: 420px) {
   .wordle__key {
-    padding: 10px 0;
-    max-width: 32px;
+    padding: 8px 0;
+    max-width: 28px;
   }
   .wordle__key--wide {
-    max-width: 46px;
+    max-width: 40px;
   }
 }
 
