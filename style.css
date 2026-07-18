@@ -260,8 +260,8 @@ body {
   color: var(--text-dim);
   background: var(--ink-panel);
   border: 1px solid var(--line);
-  border-left: none;
-  border-radius: 0 10px 10px 0;
+  border-right: none;
+  border-radius: 10px 0 0 10px;
   cursor: pointer;
   position: relative;
   z-index: 2;
@@ -306,10 +306,9 @@ body {
 }
 
 /* Home page taskbar (right-docked): the handle floats to the left of the
-   panel rather than sitting flush against the true screen edge. Its
-   rounded/flat sides are reversed from a naive mirror of the left-docked
-   taskbar — flat where it meets the panel, rounded on the exposed outer
-   side facing the page. */
+   panel rather than sitting flush against the true screen edge. It shares
+   the same rounded-left/flat-right shape as the arrow tab on other pages;
+   only its size is overridden here. */
 .taskbar__cluster {
   display: flex;
   flex-direction: column;
@@ -320,9 +319,6 @@ body {
 .taskbar__cluster .taskbar__handle {
   width: 56px;
   height: 76px;
-  border-left: none;
-  border-right: 1px solid var(--line);
-  border-radius: 0 10px 10px 0;
 }
 
 .taskbar__cluster .taskbar__arrow {
