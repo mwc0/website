@@ -13,10 +13,16 @@
   const overlayTitle = document.getElementById('snakeOverlayTitle');
   const overlaySub = document.getElementById('snakeOverlaySub');
 
-  const START_SPEED = 130; // ms per tick
+  const START_SPEED = 130; // ms per logic tick
   const MIN_SPEED = 70;
+  const MAX_QUEUE = 2; // buffered direction inputs, so quick taps aren't dropped
 
-  let snake, dir, nextDir, food, score, best, alive, paused, started, speed, timer;
+  let snake, dir, food, score, best, alive, paused, started, speed, timer;
+  let dirQueue = [];
+  let prevRender = []; // snake positions at the start of the current tick, for interpolation
+  let lastTickTime = 0;
+  let tickInterval = 0; // 0 == not moving yet, render statically
+  let renderRaf = null;
 
   function cssVar(name, fallback) {
     const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -46,7 +52,9 @@
       { x: 7, y: 10 },
     ];
     dir = { x: 1, y: 0 };
-    nextDir = { x: 1, y: 0 };
+    dirQueue = [];
+    prevRender = snake.map((s) => ({ x: s.x, y: s.y }));
+    tickInterval = 0;
     score = 0;
     speed = START_SPEED;
     alive = true;
@@ -74,7 +82,9 @@
     ctx.fill();
   }
 
-  function draw() {
+  // Draws the board with the snake eased between its previous grid position
+  // and its current one, so movement glides instead of snapping cell-to-cell.
+  function drawFrame(alpha) {
     ctx.fillStyle = '#0e2129';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -97,9 +107,20 @@
     roundRect(food.x * CELL + 3, food.y * CELL + 3, CELL - 6, CELL - 6, 4);
 
     snake.forEach((seg, idx) => {
+      const prev = idx < prevRender.length ? prevRender[idx] : seg;
+      const x = prev.x + (seg.x - prev.x) * alpha;
+      const y = prev.y + (seg.y - prev.y) * alpha;
       ctx.fillStyle = idx === 0 ? cssVar('--mint', '#7c9dfc') : 'rgba(124, 157, 252, 0.65)';
-      roundRect(seg.x * CELL + 1, seg.y * CELL + 1, CELL - 2, CELL - 2, 3);
+      roundRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2, 3);
     });
+  }
+
+  function renderLoop(now) {
+    const alpha = tickInterval > 0
+      ? Math.min(1, Math.max(0, (now - lastTickTime) / tickInterval))
+      : 1;
+    drawFrame(alpha);
+    renderRaf = requestAnimationFrame(renderLoop);
   }
 
   function gameOver() {
@@ -110,6 +131,25 @@
     overlay.classList.remove('is-hidden');
   }
 
+  // Pulls the next buffered direction, skipping any that would reverse
+  // straight into the snake's own neck.
+  function consumeQueuedDir() {
+    while (dirQueue.length) {
+      const next = dirQueue.shift();
+      if (next.x === -dir.x && next.y === -dir.y) continue;
+      return next;
+    }
+    return dir;
+  }
+
+  function queueDir(newDir) {
+    const last = dirQueue.length ? dirQueue[dirQueue.length - 1] : dir;
+    if (newDir.x === last.x && newDir.y === last.y) return; // no-op, already heading there
+    if (newDir.x === -last.x && newDir.y === -last.y) return; // would reverse, ignore
+    if (dirQueue.length >= MAX_QUEUE) dirQueue.shift();
+    dirQueue.push(newDir);
+  }
+
   function tick() {
     if (!alive) return;
     if (paused) {
@@ -117,7 +157,10 @@
       return;
     }
 
-    dir = nextDir;
+    // snapshot positions before mutating so the renderer can ease from here
+    prevRender = snake.map((s) => ({ x: s.x, y: s.y }));
+
+    dir = consumeQueuedDir();
     const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
     const hitWall = head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS;
@@ -144,7 +187,8 @@
       snake.pop();
     }
 
-    draw();
+    lastTickTime = performance.now();
+    tickInterval = speed;
     timer = setTimeout(tick, speed);
   }
 
@@ -153,11 +197,9 @@
     resetState();
     if (initialDir) {
       dir = initialDir;
-      nextDir = initialDir;
     }
     started = true;
     overlay.classList.add('is-hidden');
-    draw();
     timer = setTimeout(tick, speed);
   }
 
@@ -212,9 +254,7 @@
 
     if (paused) return;
 
-    // ignore reversal into the snake's own body
-    if (newDir.x === -dir.x && newDir.y === -dir.y) return;
-    nextDir = newDir;
+    queueDir(newDir);
   });
 
   overlay.addEventListener('click', () => {
@@ -251,8 +291,7 @@
       ? { x: dx > 0 ? 1 : -1, y: 0 }
       : { x: 0, y: dy > 0 ? 1 : -1 };
 
-    if (newDir.x === -dir.x && newDir.y === -dir.y) return;
-    nextDir = newDir;
+    queueDir(newDir);
   }, { passive: true });
 
   // initial paint before first game starts
@@ -260,5 +299,5 @@
   bestEl.textContent = String(best);
   started = false;
   resetState();
-  draw();
+  renderRaf = requestAnimationFrame(renderLoop);
 })();
