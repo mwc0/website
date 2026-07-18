@@ -98,10 +98,6 @@
       float veins = pow(clamp(1.0 - abs(fract(f * 7.0) - 0.5) * 2.0, 0.0, 1.0), 10.0);
       col += veins * vec3(0.6, 0.5, 1.0) * 0.5;
 
-      float sp = hash21(floor(uv * 140.0) + floor(t * 2.0));
-      float twinkle = smoothstep(0.985, 0.999, sp) * (0.5 + 0.5 * sin(t * 6.0 + sp * 40.0));
-      col += twinkle * vec3(1.0, 0.9, 1.0) * 1.2;
-
       float vig = smoothstep(1.5, 0.2, length(uv));
       col *= mix(0.55, 1.05, vig);
 
