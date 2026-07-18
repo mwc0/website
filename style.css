@@ -219,6 +219,8 @@ body {
 .side-nav--right {
   left: auto;
   right: 0;
+  align-items: center;
+  padding-top: 0;
 }
 
 .side-nav__trigger {
@@ -272,6 +274,31 @@ body {
 
 .taskbar__arrow {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Home page taskbar (right-docked): the handle floats to the left of the
+   panel rather than sitting flush against the true screen edge, so its
+   rounded/flat sides are the mirror of the left-docked taskbar's — flat
+   where it meets the panel, rounded on the exposed outer side. It's also
+   sized up and centred within the column instead of pinned to the top. */
+.taskbar__cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.taskbar__cluster .taskbar__handle {
+  width: 56px;
+  height: 56px;
+  border-left: 1px solid var(--line);
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+}
+
+.taskbar__cluster .taskbar__arrow {
+  width: 20px;
+  height: 20px;
 }
 
 .side-nav:hover .taskbar__arrow,
