@@ -276,31 +276,6 @@ body {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Home page taskbar (right-docked): the handle floats to the left of the
-   panel rather than sitting flush against the true screen edge, so its
-   rounded/flat sides are the mirror of the left-docked taskbar's — flat
-   where it meets the panel, rounded on the exposed outer side. It's also
-   sized up and centred within the column instead of pinned to the top. */
-.taskbar__cluster {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.taskbar__cluster .taskbar__handle {
-  width: 56px;
-  height: 56px;
-  border-left: 1px solid var(--line);
-  border-right: none;
-  border-radius: 10px 0 0 10px;
-}
-
-.taskbar__cluster .taskbar__arrow {
-  width: 20px;
-  height: 20px;
-}
-
 .side-nav:hover .taskbar__arrow,
 .taskbar.is-open .taskbar__arrow {
   transform: rotate(180deg);
@@ -328,6 +303,57 @@ body {
 .taskbar.is-open .taskbar__panel {
   width: 160px;
   padding: 16px;
+}
+
+/* Home page taskbar (right-docked): stacked vertically instead of
+   sideways, with the tools/games panel forming the top of a longer
+   taskbar and the handle cluster anchored below it. The handle's flat,
+   borderless edge sits where it meets the panel; the rounded, bordered
+   edge is on the exposed underside — the reverse of how it used to sit
+   left/right. */
+.side-nav--right .taskbar {
+  flex-direction: column;
+  align-items: center;
+}
+
+.side-nav--right .taskbar__cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.side-nav--right .taskbar__cluster .taskbar__handle {
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--line);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.side-nav--right .taskbar__cluster .taskbar__arrow {
+  width: 20px;
+  height: 20px;
+}
+
+.side-nav--right .taskbar__panel {
+  width: 120px;
+  max-height: 0;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 -24px 60px -24px rgba(0, 0, 0, 0.7);
+  transition:
+    max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    padding 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.side-nav--right:hover .taskbar__panel,
+.side-nav--right .taskbar.is-open .taskbar__panel {
+  width: 120px;
+  max-height: 160px;
+  padding: 16px 14px;
 }
 
 .taskbar__link {
