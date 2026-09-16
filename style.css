@@ -1392,7 +1392,7 @@ body.is-interacting {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  aspect-ratio: 480 / 260;
+  aspect-ratio: 480 / 340;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   overflow: hidden;

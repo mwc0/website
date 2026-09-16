@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=4">
+<link rel="stylesheet" href="../style.css?v=5">
 </head>
 <body class="body--desktop">
 
@@ -155,19 +155,20 @@
           </div>
 
           <div class="tunnel__stage">
-            <canvas id="tunnelCanvas" width="480" height="260" aria-label="Driftwalk game board"></canvas>
+            <canvas id="tunnelCanvas" width="480" height="340" aria-label="Driftwalk game board"></canvas>
             <div class="game-overlay" id="tunnelOverlay">
               <p class="game-overlay__title" id="tunnelOverlayTitle">driftwalk</p>
-              <p class="game-overlay__sub" id="tunnelOverlaySub">jump the gaps, flip gravity to swap floor and ceiling</p>
+              <p class="game-overlay__sub" id="tunnelOverlaySub">run the tunnel. steer around the walls, jump the holes.</p>
             </div>
           </div>
 
           <div class="tunnel__controls">
+            <button class="tunnel__btn" id="tunnelLeftBtn" type="button" aria-label="Move left">left</button>
             <button class="tunnel__btn" id="tunnelJumpBtn" type="button">jump</button>
-            <button class="tunnel__btn" id="tunnelFlipBtn" type="button">flip</button>
+            <button class="tunnel__btn" id="tunnelRightBtn" type="button" aria-label="Move right">right</button>
           </div>
 
-          <p class="game-hint">space, w or up to jump. s or down to flip gravity.</p>
+          <p class="game-hint">hold left or right to run around the tunnel, space or up to jump</p>
         </div>
       </div>
     </section>
@@ -194,7 +195,7 @@
   <script src="leaderboard.js?v=1"></script>
   <script src="snake/snake.js?v=3"></script>
   <script src="wordle/wordle.js?v=2"></script>
-  <script src="tunnel/tunnel.js?v=2"></script>
+  <script src="tunnel/tunnel.js?v=3"></script>
   <script src="desktop.js?v=1"></script>
 </body>
 </html>
