@@ -161,7 +161,8 @@
     });
   }
 
-  document.querySelectorAll('.console').forEach((panel) => {
+  // [data-static] panels are decorative, so they stay put.
+  document.querySelectorAll('.console:not([data-static])').forEach((panel) => {
     makeDraggable(panel);
     makeResizable(panel);
   });

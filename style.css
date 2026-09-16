@@ -128,6 +128,10 @@ a {
   cursor: grabbing;
 }
 
+.console[data-static] .console__bar {
+  cursor: default;
+}
+
 .console.is-floating {
   position: fixed;
   margin: 0;

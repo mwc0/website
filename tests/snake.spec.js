@@ -32,6 +32,27 @@ test.describe('Games desktop', () => {
     await expect(page.locator('[data-window="snake"]')).toBeHidden();
   });
 
+  test('the icon toggles its own window shut, but raises a buried one', async ({ page }) => {
+    await page.goto('/games/');
+    const snake = page.locator('[data-window="snake"]');
+
+    await page.click('[data-open="snake"]');
+    await expect(snake).toBeVisible();
+
+    // Clicking the focused window's icon closes it.
+    await page.click('[data-open="snake"]');
+    await expect(snake).toBeHidden();
+
+    // With another window on top, the icon raises instead of closing.
+    await page.click('[data-open="snake"]');
+    await page.click('[data-open="wordle"]');
+    await expect(snake).not.toHaveClass(/is-focused/);
+
+    await page.click('[data-open="snake"]');
+    await expect(snake).toBeVisible();
+    await expect(snake).toHaveClass(/is-focused/);
+  });
+
   test('keys only reach the focused game', async ({ page }) => {
     await page.goto('/games/');
     await page.click('[data-open="snake"]');
@@ -42,6 +63,30 @@ test.describe('Games desktop', () => {
     // Space starts driftwalk and must not touch the snake behind it.
     await expect(page.locator('#tunnelOverlay')).toHaveClass(/is-hidden/);
     await expect(page.locator('#snakeOverlay')).not.toHaveClass(/is-hidden/);
+  });
+
+  test('a reopened window returns to where it was left', async ({ page }) => {
+    await page.goto('/games/?open=snake');
+    const win = page.locator('[data-window="snake"]');
+    const box = (el) => el.evaluate((n) => {
+      const r = n.getBoundingClientRect();
+      return { left: Math.round(r.left), top: Math.round(r.top), width: Math.round(r.width) };
+    });
+
+    const bar = await page.locator('[data-window="snake"] .console__bar').boundingBox();
+    await page.mouse.move(bar.x + 150, bar.y + 10);
+    await page.mouse.down();
+    await page.mouse.move(bar.x + 330, bar.y + 210, { steps: 10 });
+    await page.mouse.up();
+
+    const moved = await box(win);
+
+    await page.click('[data-close="snake"]');
+    await expect(win).toBeHidden();
+    await page.click('[data-open="snake"]');
+    await expect(win).toBeVisible();
+
+    expect(await box(win)).toEqual(moved);
   });
 
   test('a window can be dragged by its title bar', async ({ page }) => {

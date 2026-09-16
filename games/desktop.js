@@ -48,6 +48,23 @@ window.Desktop = (function () {
     el.style.top = (56 + step) + 'px';
   }
 
+  // A window keeps whatever geometry the user gave it, but must not come back
+  // somewhere unreachable if the viewport shrank while it was closed.
+  function clampIntoView(el) {
+    const rect = el.getBoundingClientRect();
+    const grabbable = 80;
+    const left = Math.min(
+      Math.max(parseFloat(el.style.left) || rect.left, grabbable - rect.width),
+      window.innerWidth - grabbable
+    );
+    const top = Math.min(
+      Math.max(parseFloat(el.style.top) || rect.top, 0),
+      window.innerHeight - grabbable
+    );
+    el.style.left = left + 'px';
+    el.style.top = top + 'px';
+  }
+
   function topmostOpen(exceptId) {
     let bestId = null;
     let bestZ = -Infinity;
@@ -89,7 +106,16 @@ window.Desktop = (function () {
       // Float it up front so common.js drags it without re-measuring, and so
       // it sits on the desktop rather than in the document flow.
       entry.el.classList.add('is-floating');
-      place(entry.el);
+
+      // Only lay a window out the first time. Closing just hides it, so any
+      // drag or resize is still on the element and should be honoured.
+      if (entry.placed) {
+        clampIntoView(entry.el);
+      } else {
+        place(entry.el);
+        entry.placed = true;
+      }
+
       entry.open = true;
       const icon = document.querySelector('[data-open="' + id + '"]');
       if (icon) icon.classList.add('is-open');
@@ -127,7 +153,18 @@ window.Desktop = (function () {
   }
 
   document.querySelectorAll('[data-open]').forEach((icon) => {
-    icon.addEventListener('click', () => open(icon.dataset.open));
+    icon.addEventListener('click', () => {
+      const id = icon.dataset.open;
+      if (!isOpen(id)) {
+        open(id);
+      } else if (hasFocus(id)) {
+        close(id);
+      } else {
+        // Open but buried: raise it rather than closing something the click
+        // was probably trying to get back to.
+        focus(id);
+      }
+    });
   });
 
   document.querySelectorAll('[data-close]').forEach((btn) => {
@@ -143,7 +180,9 @@ window.Desktop = (function () {
 
   // Clicking bare desktop drops focus, so keys stop reaching the last game.
   root.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('[data-window]')) return;
+    // Icons are handled on click, and this fires first: blurring here would
+    // hide the focus state their toggle depends on.
+    if (e.target.closest('[data-window], [data-open]')) return;
     if (!focused) return;
     const prev = entries.get(focused);
     if (prev) {
