@@ -60,6 +60,9 @@
 
     handle.addEventListener('pointerdown', (e) => {
       if (e.button !== undefined && e.button !== 0) return;
+      // Window controls live in the bar. Capturing the pointer here would
+      // swallow their click, so leave them alone.
+      if (e.target.closest('button, a')) return;
 
       const rect = panel.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
@@ -162,6 +165,10 @@
     makeDraggable(panel);
     makeResizable(panel);
   });
+
+  // Shared so the games desktop can raise windows through the same z-index
+  // counter this file uses for dragging, instead of running a rival one.
+  window.WindowChrome = { floatPanel, bringToFront };
 
   // ---- Taskbar (tap-to-toggle for touch; CSS handles hover on desktop) ----
   const taskbar = document.getElementById('taskbar');

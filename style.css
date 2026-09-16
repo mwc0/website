@@ -346,6 +346,18 @@ body.is-interacting {
   user-select: none;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ---- Scroll / load reveal utility ---- */
 
 .reveal {
@@ -899,6 +911,137 @@ body.is-interacting {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* ============================================================ */
+/* Games desktop                                                  */
+/* ============================================================ */
+
+.body--desktop {
+  overflow: hidden; /* windows are fixed, the desktop itself does not scroll */
+}
+
+.desktop {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  padding: 24px 28px 28px;
+}
+
+.desktop__icons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 96px;
+}
+
+.desktop-icon {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.desktop-icon:hover,
+.desktop-icon:focus-visible {
+  background: var(--accent-soft);
+  border-color: var(--border);
+  outline: none;
+}
+
+.desktop-icon.is-open {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.desktop-icon__glyph {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-well);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.desktop-icon__label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.desktop-icon:hover .desktop-icon__label,
+.desktop-icon.is-open .desktop-icon__label {
+  color: var(--text);
+}
+
+/* A window is a .console that the desktop positions and stacks. */
+.window[hidden] {
+  display: none;
+}
+
+.window.is-focused .console__bar {
+  background: #161a17;
+  border-bottom-color: var(--border-strong);
+}
+
+.window:not(.is-focused) {
+  opacity: 0.94;
+}
+
+/* Only the red dot does anything, so it is the only one that reacts. */
+.window__close {
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: filter 0.15s ease;
+}
+
+.window__close:hover {
+  filter: brightness(1.25);
+}
+
+.window__close::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  opacity: 0;
+  background:
+    linear-gradient(to bottom, transparent 44%, var(--bg) 44%, var(--bg) 56%, transparent 56%),
+    linear-gradient(to right, transparent 44%, var(--bg) 44%, var(--bg) 56%, transparent 56%);
+  transform: rotate(45deg);
+  transition: opacity 0.15s ease;
+}
+
+.window__close:hover::after,
+.window__close:focus-visible::after {
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .desktop {
+    padding: 64px 18px 18px;
+  }
+  .desktop__icons {
+    flex-direction: row;
+    width: auto;
+    flex-wrap: wrap;
+  }
+  .desktop-icon {
+    width: 86px;
+  }
 }
 
 /* ---- Leaderboard ---- */

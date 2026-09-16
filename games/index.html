@@ -13,59 +13,165 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>matthew.quest — games</title>
-<meta name="description" content="Games on matthew.quest.">
+<meta name="description" content="Snake, Wordle and Driftwalk, playable in draggable windows on matthew.quest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=2">
+<link rel="stylesheet" href="../style.css?v=3">
 </head>
-<body>
+<body class="body--desktop">
 
   <div class="grid-overlay" aria-hidden="true"></div>
   <div class="mouse-glow" aria-hidden="true"></div>
 
-  <div class="page">
-  <main class="console">
-    <header class="console__bar" title="Drag to move">
-      <span class="dot dot--red"></span>
-      <span class="dot dot--amber"></span>
-      <span class="dot dot--green"></span>
-      <span class="console__title">games.sh</span>
-    </header>
+  <main class="desktop" data-desktop>
+    <h1 class="visually-hidden">games</h1>
 
-    <div class="console__body">
-      <p class="console__line console__line--muted">$ ls games/</p>
+    <ul class="desktop__icons">
+      <li>
+        <button class="desktop-icon" type="button" data-open="snake">
+          <span class="desktop-icon__glyph">
+            <span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">snake</span>
+        </button>
+      </li>
+      <li>
+        <button class="desktop-icon" type="button" data-open="wordle">
+          <span class="desktop-icon__glyph">
+            <span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">wordle</span>
+        </button>
+      </li>
+      <li>
+        <button class="desktop-icon" type="button" data-open="tunnel">
+          <span class="desktop-icon__glyph">
+            <span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">driftwalk</span>
+        </button>
+      </li>
+    </ul>
 
-      <div class="games-list">
-        <a class="games-list__item" href="snake/">
-          <span class="games-list__icon"><span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
-          <span class="games-list__copy">
-            <span class="games-list__name">snake/</span>
-            <span class="games-list__desc">classic grid snake</span>
-          </span>
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a class="games-list__item" href="wordle/">
-          <span class="games-list__icon"><span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span></span>
-          <span class="games-list__copy">
-            <span class="games-list__name">wordle/</span>
-            <span class="games-list__desc">unlimited word puzzle</span>
-          </span>
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a class="games-list__item" href="tunnel/">
-          <span class="games-list__icon"><span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span></span>
-          <span class="games-list__copy">
-            <span class="games-list__name">driftwalk/</span>
-            <span class="games-list__desc">endless tunnel runner</span>
-          </span>
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
+    <!-- ---- snake ---- -->
+    <section class="console window" data-window="snake" data-width="470" aria-label="Snake" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot dot--red window__close" type="button" data-close="snake" aria-label="Close snake"></button>
+        <span class="dot dot--amber" aria-hidden="true"></span>
+        <span class="dot dot--green" aria-hidden="true"></span>
+        <span class="console__title">snake.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="snake">
+          <div class="game-hud">
+            <span class="game-stat">score <strong id="snakeScore">0</strong></span>
+            <span class="game-stat">best <strong id="snakeBest">0</strong></span>
+          </div>
+
+          <div class="snake__stage">
+            <canvas id="snakeCanvas" width="400" height="400" aria-label="Snake game board"></canvas>
+            <div class="game-overlay" id="snakeOverlay">
+              <p class="game-overlay__title" id="snakeOverlayTitle">snake</p>
+              <p class="game-overlay__sub" id="snakeOverlaySub">press an arrow key or wasd to start</p>
+
+              <form class="score-entry" id="scoreEntry" hidden>
+                <label class="score-entry__label" for="scoreInitials">enter your initials</label>
+                <input class="score-entry__input" id="scoreInitials" type="text" maxlength="3"
+                       autocomplete="off" autocapitalize="characters" spellcheck="false"
+                       aria-describedby="scoreEntryError" placeholder="AAA">
+                <div class="score-entry__actions">
+                  <button class="score-entry__btn score-entry__btn--primary" type="submit" id="scoreSubmit">submit</button>
+                  <button class="score-entry__btn" type="button" id="scoreSkip">skip</button>
+                </div>
+                <p class="score-entry__error" id="scoreEntryError" role="alert"></p>
+              </form>
+            </div>
+          </div>
+
+          <p class="game-hint">arrow keys or wasd to move, space to pause, r to restart</p>
+        </div>
+
+        <section class="leaderboard" aria-labelledby="leaderboardTitle">
+          <header class="leaderboard__head">
+            <h2 class="leaderboard__title" id="leaderboardTitle">high scores</h2>
+            <span class="leaderboard__scope" id="leaderboardScope"></span>
+          </header>
+          <ol class="leaderboard__list" id="leaderboardList"></ol>
+          <p class="leaderboard__status" id="leaderboardStatus">loading scores</p>
+        </section>
       </div>
-    </div>
+    </section>
+
+    <!-- ---- wordle ---- -->
+    <section class="console window" data-window="wordle" data-width="430" aria-label="Wordle" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot dot--red window__close" type="button" data-close="wordle" aria-label="Close wordle"></button>
+        <span class="dot dot--amber" aria-hidden="true"></span>
+        <span class="dot dot--green" aria-hidden="true"></span>
+        <span class="console__title">wordle.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="wordle">
+          <div class="game-hud">
+            <span class="game-stat">streak <strong id="wordleStreak">0</strong></span>
+            <span class="game-stat">best <strong id="wordleBest">0</strong></span>
+          </div>
+
+          <div class="wordle__stage">
+            <div class="wordle__board" id="wordleBoard"></div>
+            <div class="game-overlay" id="wordleOverlay">
+              <p class="game-overlay__title" id="wordleOverlayTitle">wordle unlimited</p>
+              <p class="game-overlay__sub" id="wordleOverlaySub">guess the 5-letter word, press enter to begin</p>
+            </div>
+          </div>
+
+          <p class="wordle__message" id="wordleMessage" aria-live="polite"></p>
+
+          <div class="wordle__keyboard" id="wordleKeyboard"></div>
+
+          <p class="game-hint">type letters, enter to submit, backspace to delete</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- driftwalk ---- -->
+    <section class="console window" data-window="tunnel" data-width="560" aria-label="Driftwalk" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot dot--red window__close" type="button" data-close="tunnel" aria-label="Close driftwalk"></button>
+        <span class="dot dot--amber" aria-hidden="true"></span>
+        <span class="dot dot--green" aria-hidden="true"></span>
+        <span class="console__title">driftwalk.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="tunnel">
+          <div class="game-hud">
+            <span class="game-stat">distance <strong id="tunnelScore">0</strong></span>
+            <span class="game-stat">best <strong id="tunnelBest">0</strong></span>
+          </div>
+
+          <div class="tunnel__stage">
+            <canvas id="tunnelCanvas" width="480" height="260" aria-label="Driftwalk game board"></canvas>
+            <div class="game-overlay" id="tunnelOverlay">
+              <p class="game-overlay__title" id="tunnelOverlayTitle">driftwalk</p>
+              <p class="game-overlay__sub" id="tunnelOverlaySub">jump the gaps, flip gravity to swap floor and ceiling</p>
+            </div>
+          </div>
+
+          <div class="tunnel__controls">
+            <button class="tunnel__btn" id="tunnelJumpBtn" type="button">jump</button>
+            <button class="tunnel__btn" id="tunnelFlipBtn" type="button">flip</button>
+          </div>
+
+          <p class="game-hint">space, w or up to jump. s or down to flip gravity.</p>
+        </div>
+      </div>
+    </section>
   </main>
-  </div>
 
   <div class="side-nav">
     <div class="side-nav__trigger" aria-hidden="true"></div>
@@ -84,6 +190,11 @@
     </nav>
   </div>
 
-  <script src="../common.js?v=2"></script>
+  <script src="../common.js?v=3"></script>
+  <script src="leaderboard.js?v=1"></script>
+  <script src="snake/snake.js?v=3"></script>
+  <script src="wordle/wordle.js?v=2"></script>
+  <script src="tunnel/tunnel.js?v=2"></script>
+  <script src="desktop.js?v=1"></script>
 </body>
 </html>

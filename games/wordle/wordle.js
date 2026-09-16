@@ -1764,6 +1764,8 @@
   window.addEventListener('resize', sizeTiles);
 
   window.addEventListener('keydown', (e) => {
+    // On the desktop every game listens at once, so only act when focused.
+    if (window.Desktop && !window.Desktop.hasFocus('wordle')) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     const k = e.key;
     if (k === 'Enter') {
@@ -1793,6 +1795,11 @@
   buildKeyboard();
   buildBoard();
   sizeTiles();
+
+  // Tiles measure as zero width while the desktop window is hidden, so size
+  // them again once it is actually on screen.
+  const hostWindow = document.querySelector('[data-window="wordle"]');
+  if (hostWindow) hostWindow.addEventListener('desktop:open', sizeTiles);
   locked = true;
   overlayTitle.textContent = 'wordle unlimited';
   overlaySub.textContent = 'guess the 5-letter word — press enter to begin';

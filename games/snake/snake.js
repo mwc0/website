@@ -649,6 +649,8 @@
   const PAUSE_KEYS = new Set([' ', 'p', 'Escape']);
 
   window.addEventListener('keydown', (e) => {
+    // On the desktop every game listens at once, so only act when focused.
+    if (window.Desktop && !window.Desktop.hasFocus('snake')) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     // Never steal keystrokes from the initials field.
     if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return;
@@ -750,5 +752,31 @@
   resetState();
   boardScope.textContent = board.isRemote() ? 'global' : 'this browser';
   loadBoard();
-  renderRaf = requestAnimationFrame(renderLoop);
+
+  // On the desktop the render loop only runs while the window is open, and the
+  // game pauses when the window loses focus so it cannot die off screen.
+  const hostWindow = document.querySelector('[data-window="snake"]');
+
+  if (hostWindow) {
+    hostWindow.addEventListener('desktop:open', () => {
+      if (renderRaf === null) {
+        lastFrame = 0;
+        renderRaf = requestAnimationFrame(renderLoop);
+      }
+    });
+
+    hostWindow.addEventListener('desktop:close', () => {
+      if (renderRaf !== null) {
+        cancelAnimationFrame(renderRaf);
+        renderRaf = null;
+      }
+      if (started && alive && !paused) setPaused(true);
+    });
+
+    hostWindow.addEventListener('desktop:blur', () => {
+      if (started && alive && !paused && !entryOpen) setPaused(true);
+    });
+  } else {
+    renderRaf = requestAnimationFrame(renderLoop);
+  }
 })();

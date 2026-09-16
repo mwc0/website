@@ -160,7 +160,7 @@
       bestEl.textContent = String(best);
     }
     overlayTitle.textContent = 'run over';
-    overlaySub.textContent = `distance: ${distance} — press any key for a new run`;
+    overlaySub.textContent = `distance: ${distance}. press any key for a new run`;
     overlay.classList.remove('is-hidden');
   }
 
@@ -268,6 +268,8 @@
   ]);
 
   window.addEventListener('keydown', (e) => {
+    // On the desktop every game listens at once, so only act when focused.
+    if (window.Desktop && !window.Desktop.hasFocus('tunnel')) return;
     if (!CONTROL_KEYS.has(e.key)) return;
     e.preventDefault();
 
@@ -301,6 +303,31 @@
 
   overlay.addEventListener('click', () => {
     startGame();
+  });
+
+  // Physics advances per frame rather than per elapsed second, so simply not
+  // scheduling the next frame is a safe pause.
+  function pauseLoop() {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  function resumeLoop() {
+    if (running && alive && rafId === null) rafId = requestAnimationFrame(loop);
+  }
+
+  const hostWindow = document.querySelector('[data-window="tunnel"]');
+  if (hostWindow) {
+    hostWindow.addEventListener('desktop:blur', pauseLoop);
+    hostWindow.addEventListener('desktop:close', pauseLoop);
+    hostWindow.addEventListener('desktop:focus', resumeLoop);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseLoop();
+    else if (!hostWindow || !hostWindow.hidden) resumeLoop();
   });
 
   best = loadBest();
