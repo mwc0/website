@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../style.css?v=2">
 </head>
 <body>
 
@@ -39,16 +39,28 @@
 
       <div class="games-list">
         <a class="games-list__item" href="snake/">
-          <span class="games-list__name">snake/</span>
-          <span class="games-list__desc">classic grid snake</span>
+          <span class="games-list__icon"><span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
+          <span class="games-list__copy">
+            <span class="games-list__name">snake/</span>
+            <span class="games-list__desc">classic grid snake</span>
+          </span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
         <a class="games-list__item" href="wordle/">
-          <span class="games-list__name">wordle/</span>
-          <span class="games-list__desc">unlimited word puzzle</span>
+          <span class="games-list__icon"><span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span></span>
+          <span class="games-list__copy">
+            <span class="games-list__name">wordle/</span>
+            <span class="games-list__desc">unlimited word puzzle</span>
+          </span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
         <a class="games-list__item" href="tunnel/">
-          <span class="games-list__name">run/</span>
-          <span class="games-list__desc">endless tunnel runner</span>
+          <span class="games-list__icon"><span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span></span>
+          <span class="games-list__copy">
+            <span class="games-list__name">driftwalk/</span>
+            <span class="games-list__desc">endless tunnel runner</span>
+          </span>
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
     </div>
@@ -58,18 +70,20 @@
   <div class="side-nav">
     <div class="side-nav__trigger" aria-hidden="true"></div>
     <nav class="taskbar" id="taskbar" aria-label="Site navigation">
-      <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
-        <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="taskbar__cluster">
+        <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+          <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
       <div class="taskbar__panel">
-        <a class="taskbar__link" href="../tools/">tools</a>
         <a class="taskbar__link" href="../">home</a>
+        <a class="taskbar__link" href="../tools/">tools</a>
       </div>
     </nav>
   </div>
 
-  <script src="../common.js?v=1"></script>
+  <script src="../common.js?v=2"></script>
 </body>
 </html>

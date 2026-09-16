@@ -180,4 +180,106 @@
       }
     });
   }
+
+  // ---- Scroll/load reveal: fade + rise elements into place once ----
+  const revealEls = document.querySelectorAll('.reveal');
+  if (revealEls.length) {
+    if (prefersReducedMotion || !window.IntersectionObserver) {
+      revealEls.forEach((el) => el.classList.add('is-visible'));
+    } else {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      revealEls.forEach((el) => io.observe(el));
+    }
+  }
+
+  // ---- Hero terminal typewriter (home page only) ----
+  const heroTerminal = document.getElementById('heroTerminal');
+  if (heroTerminal) {
+    const SCRIPT = [
+      { cmd: 'whoami' },
+      { out: 'matthew' },
+      { out: '' },
+      { cmd: 'ls' },
+      { out: 'games/  tools/' },
+      { out: '' },
+      { cmd: 'cat games/README' },
+      { out: 'snake, wordle, driftwalk' },
+      { out: '' },
+      { cmd: 'cat tools/README' },
+      { out: 'length, weight, temperature, currency' },
+    ];
+
+    if (prefersReducedMotion) {
+      heroTerminal.textContent = '';
+      SCRIPT.forEach((line) => {
+        const div = document.createElement('div');
+        if (line.cmd !== undefined) {
+          div.className = 'is-cmd';
+          div.textContent = line.cmd;
+        } else {
+          div.textContent = line.out;
+        }
+        heroTerminal.appendChild(div);
+      });
+      const cursor = document.createElement('span');
+      cursor.className = 'hero-terminal__cursor';
+      heroTerminal.appendChild(cursor);
+    } else {
+      heroTerminal.textContent = '';
+      const CHAR_MS = 26;
+      const LINE_PAUSE_MS = 260;
+
+      let lineIndex = 0;
+      let cursor = null;
+
+      function ensureCursor() {
+        if (!cursor) {
+          cursor = document.createElement('span');
+          cursor.className = 'hero-terminal__cursor';
+        }
+        heroTerminal.appendChild(cursor);
+      }
+
+      function typeLine() {
+        if (lineIndex >= SCRIPT.length) {
+          ensureCursor();
+          return;
+        }
+        const line = SCRIPT[lineIndex];
+        const div = document.createElement('div');
+        const isCmd = line.cmd !== undefined;
+        const text = isCmd ? line.cmd : line.out;
+        if (isCmd) div.className = 'is-cmd';
+        heroTerminal.appendChild(div);
+
+        if (!isCmd || text === '') {
+          div.textContent = text;
+          lineIndex += 1;
+          setTimeout(typeLine, LINE_PAUSE_MS);
+          return;
+        }
+
+        let charIndex = 0;
+        (function typeChar() {
+          div.textContent = text.slice(0, charIndex);
+          charIndex += 1;
+          if (charIndex <= text.length) {
+            setTimeout(typeChar, CHAR_MS);
+          } else {
+            lineIndex += 1;
+            setTimeout(typeLine, LINE_PAUSE_MS);
+          }
+        })();
+      }
+
+      typeLine();
+    }
+  }
 })();

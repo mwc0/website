@@ -13,37 +13,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>matthew.quest</title>
-<meta name="description" content="matthew.quest — tools and games.">
+<meta name="description" content="matthew.quest — small games and useful tools, built by hand.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
-  <canvas id="rippleCanvas" class="ripple-layer" aria-hidden="true"></canvas>
+  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="mouse-glow" aria-hidden="true"></div>
 
-  <div class="side-nav side-nav--right">
+  <div class="home">
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__content reveal" id="heroContent">
+          <h1 class="hero__title">matthew<em>.</em>quest</h1>
+          <p class="hero__subtitle">Snake, Wordle, and an endless runner sit next to a fast unit and currency converter. No sign-up, open and go.</p>
+          <div class="hero__ctas">
+            <a class="btn btn--primary" href="games/">
+              play a game
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <a class="btn btn--secondary" href="tools/">
+              open the tools
+              <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero__terminal console reveal" id="heroTerminalPanel" style="--reveal-delay: 0.12s" title="Drag to move">
+          <header class="console__bar">
+            <span class="dot dot--red"></span>
+            <span class="dot dot--amber"></span>
+            <span class="dot dot--green"></span>
+            <span class="console__title">guest@matthew.quest</span>
+          </header>
+          <div class="console__body">
+            <div class="hero-terminal__lines" id="heroTerminal"><span class="is-cmd">whoami</span>
+matthew
+
+<span class="is-cmd">ls</span>
+games/  tools/</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase">
+      <article class="showcase__panel reveal" id="showcaseGames">
+        <h2 class="showcase__panel-title">Games</h2>
+        <p class="showcase__panel-desc">Three quick ones, built to click and play in the browser. No installs.</p>
+        <div class="showcase__game-list">
+          <a class="showcase__game" href="games/snake/">
+            <span class="showcase__game-icon"><span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">Snake</span>
+              <span class="showcase__game-desc">classic grid snake</span>
+            </span>
+          </a>
+          <a class="showcase__game" href="games/wordle/">
+            <span class="showcase__game-icon"><span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">Wordle</span>
+              <span class="showcase__game-desc">unlimited word puzzle</span>
+            </span>
+          </a>
+          <a class="showcase__game" href="games/tunnel/">
+            <span class="showcase__game-icon"><span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">Driftwalk</span>
+              <span class="showcase__game-desc">endless tunnel runner</span>
+            </span>
+          </a>
+        </div>
+        <a class="showcase__link" href="games/">
+          see all games
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </article>
+
+      <article class="showcase__panel reveal" id="showcaseTools" style="--reveal-delay: 0.08s">
+        <h2 class="showcase__panel-title">Tools</h2>
+        <p class="showcase__panel-desc">A converter for length, weight, temperature, and currency, with live exchange rates.</p>
+        <a class="showcase__link" href="tools/" style="margin-top: 0;">
+          open converter
+          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </article>
+    </section>
+
+    <footer class="site-footer reveal">
+      <span class="site-footer__brand">matthew.quest</span>
+    </footer>
+  </div>
+
+  <div class="side-nav">
     <div class="side-nav__trigger" aria-hidden="true"></div>
     <nav class="taskbar" id="taskbar" aria-label="Site navigation">
       <div class="taskbar__cluster">
-        <span class="taskbar__mark" aria-hidden="true"></span>
         <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
           <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <span class="taskbar__tail" aria-hidden="true"></span>
       </div>
       <div class="taskbar__panel">
-        <a class="taskbar__link" href="tools/">tools</a>
         <a class="taskbar__link" href="games/">games</a>
+        <a class="taskbar__link" href="tools/">tools</a>
       </div>
     </nav>
   </div>
 
-  <script src="ripple-bg.js?v=1"></script>
-  <script src="common.js?v=1"></script>
+  <script src="common.js?v=2"></script>
 </body>
 </html>

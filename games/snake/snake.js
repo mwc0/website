@@ -3,9 +3,11 @@
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
+
   const COLS = 20;
   const ROWS = 20;
-  const CELL = canvas.width / COLS;
+  const LOGICAL = 400;
+  const CELL = LOGICAL / COLS;
 
   const scoreEl = document.getElementById('snakeScore');
   const bestEl = document.getElementById('snakeBest');
@@ -13,9 +15,23 @@
   const overlayTitle = document.getElementById('snakeOverlayTitle');
   const overlaySub = document.getElementById('snakeOverlaySub');
 
-  const START_SPEED = 130; // ms per logic tick
-  const MIN_SPEED = 70;
-  const MAX_QUEUE = 2; // buffered direction inputs, so quick taps aren't dropped
+  const boardList = document.getElementById('leaderboardList');
+  const boardStatus = document.getElementById('leaderboardStatus');
+  const boardScope = document.getElementById('leaderboardScope');
+  const entryForm = document.getElementById('scoreEntry');
+  const entryInput = document.getElementById('scoreInitials');
+  const entryError = document.getElementById('scoreEntryError');
+  const entrySkip = document.getElementById('scoreSkip');
+  const entrySubmit = document.getElementById('scoreSubmit');
+
+  const START_SPEED = 135; // ms per logic tick
+  const MIN_SPEED = 68;
+  const SPEED_STEP = 3;
+  const MAX_QUEUE = 3; // buffered direction inputs, so quick taps aren't dropped
+  const DEATH_MS = 420; // death animation before the overlay appears
+  const RESTART_LOCKOUT_MS = 450; // stops a stray keypress restarting instantly
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   let snake, dir, food, score, best, alive, paused, started, speed, timer;
   let dirQueue = [];
@@ -23,11 +39,62 @@
   let lastTickTime = 0;
   let tickInterval = 0; // 0 == not moving yet, render statically
   let renderRaf = null;
+  let lastFrame = 0;
+  let deadAt = 0;
+  let deathT = 0; // 0..1 progress of the death animation
+  let overlayShown = true;
+  let beatBest = false;
+  let particles = [];
+  let popups = [];
+  let boardRows = [];
+  let entryOpen = false;
+
+  // ---- palette, read once from the stylesheet so the game tracks the theme ----
 
   function cssVar(name, fallback) {
     const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
     return v || fallback;
   }
+
+  function hexToRgb(hex, fallback) {
+    let h = String(hex).replace('#', '').trim();
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    if (!/^[0-9a-f]{6}$/i.test(h)) return fallback;
+    return [
+      parseInt(h.slice(0, 2), 16),
+      parseInt(h.slice(2, 4), 16),
+      parseInt(h.slice(4, 6), 16),
+    ];
+  }
+
+  const palette = {};
+
+  function readPalette() {
+    palette.board = cssVar('--bg-well', '#0d0f0d');
+    palette.accent = cssVar('--accent', '#3cff8e');
+    palette.accentRgb = hexToRgb(palette.accent, [60, 255, 142]);
+    palette.food = cssVar('--warn', '#e2c14c');
+    palette.foodRgb = hexToRgb(palette.food, [226, 193, 76]);
+    palette.danger = cssVar('--danger', '#ff6b5e');
+    palette.dangerRgb = hexToRgb(palette.danger, [255, 107, 94]);
+  }
+
+  function rgba(rgb, a) {
+    return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${a})`;
+  }
+
+  // ---- canvas sizing: render at device resolution so the board stays crisp ----
+
+  function setupCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(LOGICAL * dpr);
+    canvas.height = Math.round(LOGICAL * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  window.addEventListener('resize', setupCanvas);
+
+  // ---- persistence ----
 
   function loadBest() {
     try {
@@ -41,9 +108,18 @@
     try {
       localStorage.setItem('snake-best-score', String(value));
     } catch (e) {
-      // storage unavailable — ignore
+      // storage unavailable, ignore
     }
   }
+
+  function bump(el) {
+    if (!el || reduceMotion) return;
+    el.classList.remove('is-bump');
+    void el.offsetWidth; // restart the animation
+    el.classList.add('is-bump');
+  }
+
+  // ---- state ----
 
   function resetState() {
     snake = [
@@ -59,16 +135,109 @@
     speed = START_SPEED;
     alive = true;
     paused = false;
+    deathT = 0;
+    beatBest = false;
+    particles = [];
+    popups = [];
     scoreEl.textContent = '0';
     placeFood();
   }
 
   function placeFood() {
-    let pos;
-    do {
-      pos = { x: Math.floor(Math.random() * COLS), y: Math.floor(Math.random() * ROWS) };
-    } while (snake.some((s) => s.x === pos.x && s.y === pos.y));
-    food = pos;
+    const free = [];
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        if (!snake.some((s) => s.x === x && s.y === y)) free.push({ x, y });
+      }
+    }
+    if (!free.length) return; // board full, player has won as hard as possible
+    food = free[Math.floor(Math.random() * free.length)];
+  }
+
+  // ---- effects ----
+
+  function spawnBurst(cx, cy, rgb, count) {
+    if (reduceMotion) return;
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+      const speedPx = 40 + Math.random() * 90;
+      particles.push({
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speedPx,
+        vy: Math.sin(angle) * speedPx,
+        life: 0,
+        ttl: 0.4 + Math.random() * 0.3,
+        rgb,
+      });
+    }
+  }
+
+  function spawnPopup(cx, cy, text) {
+    if (reduceMotion) return;
+    popups.push({ x: cx, y: cy, text, life: 0, ttl: 0.75 });
+  }
+
+  function updateEffects(dt) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.life += dt;
+      if (p.life >= p.ttl) {
+        particles.splice(i, 1);
+        continue;
+      }
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vx *= 0.92;
+      p.vy *= 0.92;
+    }
+
+    for (let i = popups.length - 1; i >= 0; i--) {
+      const p = popups[i];
+      p.life += dt;
+      if (p.life >= p.ttl) popups.splice(i, 1);
+    }
+
+    if (!alive && deathT < 1) {
+      deathT = Math.min(1, deathT + dt / (DEATH_MS / 1000));
+      if (deathT >= 1 && !overlayShown) showGameOver();
+    }
+  }
+
+  // ---- drawing ----
+
+  function drawBoard() {
+    ctx.fillStyle = palette.board;
+    ctx.fillRect(0, 0, LOGICAL, LOGICAL);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.032)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 1; i < COLS; i++) {
+      ctx.moveTo(Math.round(i * CELL) + 0.5, 0);
+      ctx.lineTo(Math.round(i * CELL) + 0.5, LOGICAL);
+    }
+    for (let j = 1; j < ROWS; j++) {
+      ctx.moveTo(0, Math.round(j * CELL) + 0.5);
+      ctx.lineTo(LOGICAL, Math.round(j * CELL) + 0.5);
+    }
+    ctx.stroke();
+  }
+
+  function drawFood(now) {
+    if (!food) return;
+    const pulse = reduceMotion ? 1 : 1 + Math.sin(now / 300) * 0.09;
+    const size = CELL * 0.54 * pulse;
+    const cx = food.x * CELL + CELL / 2;
+    const cy = food.y * CELL + CELL / 2;
+
+    if (!reduceMotion) {
+      ctx.shadowColor = rgba(palette.foodRgb, 0.9);
+      ctx.shadowBlur = 14;
+    }
+    ctx.fillStyle = palette.food;
+    roundRect(cx - size / 2, cy - size / 2, size, size, size * 0.32);
+    ctx.shadowBlur = 0;
   }
 
   function roundRect(x, y, w, h, r) {
@@ -82,53 +251,275 @@
     ctx.fill();
   }
 
-  // Draws the board with the snake eased between its previous grid position
-  // and its current one, so movement glides instead of snapping cell-to-cell.
-  function drawFrame(alpha) {
-    ctx.fillStyle = '#0e2129';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.strokeStyle = 'rgba(61, 47, 122, 0.35)';
-    ctx.lineWidth = 1;
-    for (let i = 1; i < COLS; i++) {
-      ctx.beginPath();
-      ctx.moveTo(i * CELL, 0);
-      ctx.lineTo(i * CELL, canvas.height);
-      ctx.stroke();
-    }
-    for (let j = 1; j < ROWS; j++) {
-      ctx.beginPath();
-      ctx.moveTo(0, j * CELL);
-      ctx.lineTo(canvas.width, j * CELL);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = cssVar('--coral', '#ef6e64');
-    roundRect(food.x * CELL + 3, food.y * CELL + 3, CELL - 6, CELL - 6, 4);
-
-    snake.forEach((seg, idx) => {
+  // Interpolated centre points, head first.
+  function snakePoints(alpha) {
+    return snake.map((seg, idx) => {
       const prev = idx < prevRender.length ? prevRender[idx] : seg;
       const x = prev.x + (seg.x - prev.x) * alpha;
       const y = prev.y + (seg.y - prev.y) * alpha;
-      ctx.fillStyle = idx === 0 ? cssVar('--mint', '#7c9dfc') : 'rgba(124, 157, 252, 0.65)';
-      roundRect(x * CELL + 1, y * CELL + 1, CELL - 2, CELL - 2, 3);
+      return { x: x * CELL + CELL / 2, y: y * CELL + CELL / 2 };
     });
   }
 
+  function drawSnake(pts, now) {
+    const n = pts.length;
+    const dying = !alive;
+    const rgb = dying ? palette.dangerRgb : palette.accentRgb;
+    const fade = dying ? 1 - deathT * 0.75 : 1;
+    const idle = started || reduceMotion ? 1 : 1 + Math.sin(now / 520) * 0.04;
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Body drawn tail first so the head sits on top, with a taper and a fade
+    // toward the tail so the snake reads as one ribbon rather than tiles.
+    for (let i = n - 1; i > 0; i--) {
+      const t = i / Math.max(1, n - 1);
+      const a = pts[i];
+      const b = pts[i - 1];
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.lineWidth = CELL * (0.56 + (1 - t) * 0.26) * idle;
+      ctx.strokeStyle = rgba(rgb, (1 - t * 0.5) * fade);
+      ctx.stroke();
+    }
+
+    const head = pts[0];
+    const headR = CELL * 0.42 * idle;
+
+    if (!reduceMotion) {
+      ctx.shadowColor = rgba(rgb, 0.85);
+      ctx.shadowBlur = dying ? 6 : 16;
+    }
+    ctx.fillStyle = rgba(rgb, fade);
+    ctx.beginPath();
+    ctx.arc(head.x, head.y, headR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // eyes, facing the direction of travel
+    const fx = dir.x;
+    const fy = dir.y;
+    const px = -dir.y;
+    const py = dir.x;
+    const eyeR = Math.max(1.4, CELL * 0.085);
+    ctx.fillStyle = palette.board;
+    for (const side of [1, -1]) {
+      const ex = head.x + fx * CELL * 0.14 + px * side * CELL * 0.17;
+      const ey = head.y + fy * CELL * 0.14 + py * side * CELL * 0.17;
+      ctx.beginPath();
+      ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  function drawEffects() {
+    for (const p of particles) {
+      const k = 1 - p.life / p.ttl;
+      ctx.fillStyle = rgba(p.rgb, k * 0.85);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2.4 * k + 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    if (popups.length) {
+      ctx.font = '600 13px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      for (const p of popups) {
+        const k = p.life / p.ttl;
+        ctx.fillStyle = rgba(palette.accentRgb, 1 - k);
+        ctx.fillText(p.text, p.x, p.y - k * 22);
+      }
+    }
+  }
+
+  function drawFrame(alpha, now) {
+    drawBoard();
+    drawFood(now);
+    drawSnake(snakePoints(alpha), now);
+    drawEffects();
+  }
+
   function renderLoop(now) {
-    const alpha = tickInterval > 0
+    const dt = lastFrame ? Math.min(0.05, (now - lastFrame) / 1000) : 0;
+    lastFrame = now;
+
+    updateEffects(dt);
+
+    const moving = alive && !paused && tickInterval > 0;
+    const alpha = moving
       ? Math.min(1, Math.max(0, (now - lastTickTime) / tickInterval))
       : 1;
-    drawFrame(alpha);
+
+    drawFrame(alpha, now);
     renderRaf = requestAnimationFrame(renderLoop);
+  }
+
+  // ---- leaderboard ----
+
+  const GAME_ID = 'snake';
+  const INITIALS_KEY = 'snake-initials';
+  const board = window.Leaderboard;
+
+  function rememberInitials(name) {
+    try {
+      localStorage.setItem(INITIALS_KEY, name);
+    } catch (e) {
+      // storage unavailable, ignore
+    }
+  }
+
+  function recallInitials() {
+    try {
+      return localStorage.getItem(INITIALS_KEY) || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function renderBoard(highlight) {
+    boardList.innerHTML = '';
+
+    if (!boardRows.length) {
+      boardStatus.textContent = 'no scores yet, be the first';
+      return;
+    }
+
+    boardStatus.textContent = '';
+    let marked = false;
+
+    boardRows.forEach((row, i) => {
+      const li = document.createElement('li');
+      li.className = 'leaderboard__row';
+
+      if (!marked && highlight && row.name === highlight.name && row.score === highlight.score) {
+        li.classList.add('is-you');
+        marked = true;
+      }
+
+      const rank = document.createElement('span');
+      rank.className = 'leaderboard__rank';
+      rank.textContent = String(i + 1).padStart(2, '0');
+
+      const name = document.createElement('span');
+      name.className = 'leaderboard__name';
+      name.textContent = row.name;
+
+      const value = document.createElement('span');
+      value.className = 'leaderboard__score';
+      value.textContent = String(row.score);
+
+      li.append(rank, name, value);
+      boardList.appendChild(li);
+    });
+  }
+
+  async function loadBoard(highlight) {
+    try {
+      boardRows = await board.top(GAME_ID);
+      renderBoard(highlight);
+    } catch (err) {
+      boardRows = [];
+      boardList.innerHTML = '';
+      boardStatus.textContent = err.message || 'leaderboard unavailable';
+    }
+  }
+
+  function qualifies(value) {
+    if (value <= 0) return false;
+    if (boardRows.length < board.LIMIT) return true;
+    return value > boardRows[boardRows.length - 1].score;
+  }
+
+  function openEntry() {
+    entryOpen = true;
+    entryError.textContent = '';
+    entryInput.value = recallInitials();
+    entryForm.hidden = false;
+    overlay.classList.add('has-entry');
+    entryInput.focus();
+    entryInput.select();
+  }
+
+  function closeEntry() {
+    entryOpen = false;
+    entryForm.hidden = true;
+    overlay.classList.remove('has-entry');
+    overlaySub.textContent = 'press any direction key to play again';
+  }
+
+  entryInput.addEventListener('input', () => {
+    const cleaned = board.normalizeName(entryInput.value);
+    if (cleaned !== entryInput.value) entryInput.value = cleaned;
+    entryError.textContent = '';
+  });
+
+  entryForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = board.normalizeName(entryInput.value);
+    const problem = board.validateName(name);
+    if (problem) {
+      entryError.textContent = problem;
+      entryInput.focus();
+      return;
+    }
+
+    entrySubmit.disabled = true;
+    entrySubmit.textContent = 'sending';
+    try {
+      const row = await board.submit(GAME_ID, name, score);
+      rememberInitials(name);
+      closeEntry();
+      await loadBoard(row);
+    } catch (err) {
+      entryError.textContent = err.message || 'could not submit';
+    } finally {
+      entrySubmit.disabled = false;
+      entrySubmit.textContent = 'submit';
+    }
+  });
+
+  entrySkip.addEventListener('click', () => {
+    closeEntry();
+  });
+
+  // ---- game flow ----
+
+  function showGameOver() {
+    overlayShown = true;
+    overlayTitle.textContent = 'game over';
+
+    const madeTheCut = qualifies(score);
+    overlaySub.textContent = madeTheCut
+      ? `score: ${score}. you made the top ${board.LIMIT}`
+      : (beatBest
+        ? `new best: ${score}. press any direction key to play again`
+        : `score: ${score}. press any direction key to play again`);
+
+    overlay.classList.remove('is-hidden');
+    if (madeTheCut) openEntry();
+
+    // The qualify check above uses the cached board so the form appears
+    // instantly. Refresh afterwards so the standings shown are current.
+    loadBoard();
   }
 
   function gameOver() {
     alive = false;
+    deadAt = performance.now();
+    deathT = 0;
+    overlayShown = false;
     if (timer) clearTimeout(timer);
-    overlayTitle.textContent = 'game over';
-    overlaySub.textContent = `score: ${score} — press an arrow key or wasd to try again`;
-    overlay.classList.remove('is-hidden');
+
+    const head = snake[0];
+    spawnBurst(head.x * CELL + CELL / 2, head.y * CELL + CELL / 2, palette.dangerRgb, 14);
+
+    if (reduceMotion) {
+      deathT = 1;
+      showGameOver();
+    }
   }
 
   // Pulls the next buffered direction, skipping any that would reverse
@@ -144,7 +535,7 @@
 
   function queueDir(newDir) {
     const last = dirQueue.length ? dirQueue[dirQueue.length - 1] : dir;
-    if (newDir.x === last.x && newDir.y === last.y) return; // no-op, already heading there
+    if (newDir.x === last.x && newDir.y === last.y) return; // already heading there
     if (newDir.x === -last.x && newDir.y === -last.y) return; // would reverse, ignore
     if (dirQueue.length >= MAX_QUEUE) dirQueue.shift();
     dirQueue.push(newDir);
@@ -164,7 +555,10 @@
     const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
 
     const hitWall = head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS;
-    const hitSelf = snake.some((s) => s.x === head.x && s.y === head.y);
+    // The tail vacates its cell on this same tick, so chasing it is legal.
+    const willGrow = food && head.x === food.x && head.y === food.y;
+    const solid = willGrow ? snake : snake.slice(0, -1);
+    const hitSelf = solid.some((s) => s.x === head.x && s.y === head.y);
 
     if (hitWall || hitSelf) {
       gameOver();
@@ -173,15 +567,20 @@
 
     snake.unshift(head);
 
-    if (head.x === food.x && head.y === food.y) {
+    if (willGrow) {
       score += 1;
       scoreEl.textContent = String(score);
+      bump(scoreEl);
+      spawnBurst(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, palette.foodRgb, 10);
+      spawnPopup(food.x * CELL + CELL / 2, food.y * CELL + CELL / 2, '+1');
       if (score > best) {
         best = score;
+        beatBest = true;
         bestEl.textContent = String(best);
+        bump(bestEl);
         saveBest(best);
       }
-      speed = Math.max(MIN_SPEED, speed - 2);
+      speed = Math.max(MIN_SPEED, speed - SPEED_STEP);
       placeFood();
     } else {
       snake.pop();
@@ -195,109 +594,161 @@
   function startGame(initialDir) {
     if (timer) clearTimeout(timer);
     resetState();
-    if (initialDir) {
+    // Ignore a starting direction that would reverse into the snake's own body.
+    if (initialDir && !(initialDir.x === -dir.x && initialDir.y === -dir.y)) {
       dir = initialDir;
     }
     started = true;
+    overlayShown = false;
+    if (entryOpen) closeEntry();
+    overlayTitle.textContent = '';
+    overlaySub.textContent = '';
     overlay.classList.add('is-hidden');
+    lastTickTime = performance.now();
+    tickInterval = speed;
     timer = setTimeout(tick, speed);
   }
 
-  function togglePause() {
+  function setPaused(next) {
     if (!started || !alive) return;
-    paused = !paused;
+    paused = next;
     overlayTitle.textContent = paused ? 'paused' : '';
     overlaySub.textContent = paused ? 'press space to resume' : '';
     overlay.classList.toggle('is-hidden', !paused);
+    if (!paused) {
+      lastTickTime = performance.now();
+    }
   }
+
+  function togglePause() {
+    setPaused(!paused);
+  }
+
+  function canRestart() {
+    return performance.now() - deadAt > RESTART_LOCKOUT_MS;
+  }
+
+  function requestStart(initialDir) {
+    if (started && !alive && !canRestart()) return;
+    startGame(initialDir);
+  }
+
+  // ---- input ----
 
   const KEY_DIRS = {
     ArrowUp: { x: 0, y: -1 },
-    w: { x: 0, y: -1 },
-    W: { x: 0, y: -1 },
     ArrowDown: { x: 0, y: 1 },
-    s: { x: 0, y: 1 },
-    S: { x: 0, y: 1 },
     ArrowLeft: { x: -1, y: 0 },
-    a: { x: -1, y: 0 },
-    A: { x: -1, y: 0 },
     ArrowRight: { x: 1, y: 0 },
+    w: { x: 0, y: -1 },
+    s: { x: 0, y: 1 },
+    a: { x: -1, y: 0 },
     d: { x: 1, y: 0 },
-    D: { x: 1, y: 0 },
   };
 
-  const CONTROL_KEYS = new Set([
-    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-    'w', 'W', 's', 'S', 'a', 'A', 'd', 'D', ' ',
-  ]);
+  const PAUSE_KEYS = new Set([' ', 'p', 'Escape']);
 
   window.addEventListener('keydown', (e) => {
-    if (!CONTROL_KEYS.has(e.key)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Never steal keystrokes from the initials field.
+    if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return;
+    // While the score form is open, keys must not restart and discard it.
+    if (entryOpen) return;
+
+    const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+
+    if (PAUSE_KEYS.has(key)) {
+      e.preventDefault();
+      if (!started || !alive) requestStart();
+      else togglePause();
+      return;
+    }
+
+    if (key === 'r') {
+      e.preventDefault();
+      requestStart();
+      return;
+    }
+
+    const newDir = KEY_DIRS[key];
+    if (!newDir) return;
     e.preventDefault();
 
-    if (e.key === ' ') {
-      if (!started || !alive) {
-        startGame();
-      } else {
-        togglePause();
-      }
-      return;
-    }
-
-    const newDir = KEY_DIRS[e.key];
-    if (!newDir) return;
-
     if (!started || !alive) {
-      startGame(newDir);
+      requestStart(newDir);
       return;
     }
 
-    if (paused) return;
+    if (paused) {
+      setPaused(false);
+      return;
+    }
 
     queueDir(newDir);
   });
 
-  overlay.addEventListener('click', () => {
-    if (!started || !alive) startGame();
-    else if (paused) togglePause();
+  overlay.addEventListener('click', (e) => {
+    if (entryOpen) return; // the overlay is hosting the score form
+    if (e.target.closest('.score-entry')) return;
+    if (!started || !alive) requestStart();
+    else if (paused) setPaused(false);
   });
 
-  // basic touch-swipe support for mobile
-  let touchStartX = null;
-  let touchStartY = null;
+  // Pause rather than let the snake run on while the tab is hidden.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && started && alive && !paused) setPaused(true);
+  });
+
+  // ---- touch: swipe registers mid-drag so it feels immediate ----
+
+  const SWIPE_THRESHOLD = 22;
+  let touchX = null;
+  let touchY = null;
+  let touchMoved = false;
 
   canvas.addEventListener('touchstart', (e) => {
     const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
+    touchX = t.clientX;
+    touchY = t.clientY;
+    touchMoved = false;
   }, { passive: true });
 
-  canvas.addEventListener('touchend', (e) => {
-    if (touchStartX === null) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-    touchStartX = null;
+  canvas.addEventListener('touchmove', (e) => {
+    if (touchX === null || !started || !alive || paused) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touchX;
+    const dy = t.clientY - touchY;
+    if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
 
-    if (!started || !alive) {
-      startGame();
-      return;
-    }
-    if (paused) return;
-
-    if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return; // treat as tap, ignore
-
-    const newDir = Math.abs(dx) > Math.abs(dy)
+    queueDir(Math.abs(dx) > Math.abs(dy)
       ? { x: dx > 0 ? 1 : -1, y: 0 }
-      : { x: 0, y: dy > 0 ? 1 : -1 };
+      : { x: 0, y: dy > 0 ? 1 : -1 });
 
-    queueDir(newDir);
+    // anchor to the current point so a single drag can chain turns
+    touchX = t.clientX;
+    touchY = t.clientY;
+    touchMoved = true;
   }, { passive: true });
 
-  // initial paint before first game starts
+  canvas.addEventListener('touchend', () => {
+    const wasTap = touchX !== null && !touchMoved;
+    touchX = null;
+    if (!wasTap) return;
+
+    if (!started || !alive) requestStart();
+    else togglePause();
+  }, { passive: true });
+
+  // ---- init ----
+
+  readPalette();
+  setupCanvas();
   best = loadBest();
   bestEl.textContent = String(best);
   started = false;
+  overlayShown = true;
   resetState();
+  boardScope.textContent = board.isRemote() ? 'global' : 'this browser';
+  loadBoard();
   renderRaf = requestAnimationFrame(renderLoop);
 })();

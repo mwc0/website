@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../../images/favicon.ico">
-<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="../../style.css?v=2">
 </head>
 <body>
 
@@ -48,11 +48,32 @@
           <div class="game-overlay" id="snakeOverlay">
             <p class="game-overlay__title" id="snakeOverlayTitle">snake</p>
             <p class="game-overlay__sub" id="snakeOverlaySub">press an arrow key or wasd to start</p>
+
+            <form class="score-entry" id="scoreEntry" hidden>
+              <label class="score-entry__label" for="scoreInitials">enter your initials</label>
+              <input class="score-entry__input" id="scoreInitials" type="text" maxlength="3"
+                     autocomplete="off" autocapitalize="characters" spellcheck="false"
+                     aria-describedby="scoreEntryError" placeholder="AAA">
+              <div class="score-entry__actions">
+                <button class="score-entry__btn score-entry__btn--primary" type="submit" id="scoreSubmit">submit</button>
+                <button class="score-entry__btn" type="button" id="scoreSkip">skip</button>
+              </div>
+              <p class="score-entry__error" id="scoreEntryError" role="alert"></p>
+            </form>
           </div>
         </div>
 
-        <p class="game-hint">arrow keys / wasd to move · space to pause · tap board on mobile</p>
+        <p class="game-hint">arrow keys or wasd to move, space to pause, r to restart</p>
       </div>
+
+      <section class="leaderboard" aria-labelledby="leaderboardTitle">
+        <header class="leaderboard__head">
+          <h2 class="leaderboard__title" id="leaderboardTitle">high scores</h2>
+          <span class="leaderboard__scope" id="leaderboardScope"></span>
+        </header>
+        <ol class="leaderboard__list" id="leaderboardList"></ol>
+        <p class="leaderboard__status" id="leaderboardStatus">loading scores</p>
+      </section>
     </div>
   </main>
   </div>
@@ -60,19 +81,22 @@
   <div class="side-nav">
     <div class="side-nav__trigger" aria-hidden="true"></div>
     <nav class="taskbar" id="taskbar" aria-label="Site navigation">
-      <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
-        <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+      <div class="taskbar__cluster">
+        <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
+          <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
       <div class="taskbar__panel">
-        <a class="taskbar__link" href="../">games</a>
         <a class="taskbar__link" href="../../">home</a>
+        <a class="taskbar__link" href="../">games</a>
       </div>
     </nav>
   </div>
 
-  <script src="../../common.js?v=1"></script>
-  <script src="snake.js?v=1"></script>
+  <script src="../../common.js?v=2"></script>
+  <script src="../leaderboard.js?v=1"></script>
+  <script src="snake.js?v=2"></script>
 </body>
 </html>
