@@ -207,87 +207,90 @@
     }
   }
 
-  // ---- Hero terminal typewriter (home page only) ----
+  // ---- Live visitor presence (Supabase Realtime) ----
+  const SUPABASE_URL = 'https://haeqrrxqwksfuawyhwtv.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_s7W8VMkmepZZ62M-msXHSg_QDRzajCI';
+
+  let presenceCount = null;
+  const presenceSubscribers = [];
+
+  function notifyPresence() {
+    presenceSubscribers.forEach((fn) => fn(presenceCount));
+  }
+
+  function onPresence(fn) {
+    presenceSubscribers.push(fn);
+    fn(presenceCount);
+  }
+
+  (function initPresence() {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      presenceCount = 'unavailable';
+      notifyPresence();
+      return;
+    }
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const sessionKey = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Math.random()).slice(2);
+    const channel = client.channel('site-presence', {
+      config: { presence: { key: sessionKey } },
+    });
+
+    channel.on('presence', { event: 'sync' }, () => {
+      presenceCount = Object.keys(channel.presenceState()).length;
+      notifyPresence();
+    });
+
+    channel.subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        channel.track({ online_at: Date.now() });
+      }
+    });
+  })();
+
+  // ---- Hero terminal: live visitor count (home page only) ----
   const heroTerminal = document.getElementById('heroTerminal');
   if (heroTerminal) {
-    const SCRIPT = [
-      { cmd: 'whoami' },
-      { out: 'matthew' },
-      { out: '' },
-      { cmd: 'ls' },
-      { out: 'games/  tools/' },
-      { out: '' },
-      { cmd: 'cat games/README' },
-      { out: 'snake, wordle, driftwalk' },
-      { out: '' },
-      { cmd: 'cat tools/README' },
-      { out: 'length, weight, temperature, currency' },
-    ];
-
-    if (prefersReducedMotion) {
-      heroTerminal.textContent = '';
-      SCRIPT.forEach((line) => {
-        const div = document.createElement('div');
-        if (line.cmd !== undefined) {
-          div.className = 'is-cmd';
-          div.textContent = line.cmd;
-        } else {
-          div.textContent = line.out;
-        }
-        heroTerminal.appendChild(div);
-      });
-      const cursor = document.createElement('span');
-      cursor.className = 'hero-terminal__cursor';
-      heroTerminal.appendChild(cursor);
-    } else {
-      heroTerminal.textContent = '';
-      const CHAR_MS = 26;
-      const LINE_PAUSE_MS = 260;
-
-      let lineIndex = 0;
-      let cursor = null;
-
-      function ensureCursor() {
-        if (!cursor) {
-          cursor = document.createElement('span');
-          cursor.className = 'hero-terminal__cursor';
-        }
-        heroTerminal.appendChild(cursor);
-      }
-
-      function typeLine() {
-        if (lineIndex >= SCRIPT.length) {
-          ensureCursor();
-          return;
-        }
-        const line = SCRIPT[lineIndex];
-        const div = document.createElement('div');
-        const isCmd = line.cmd !== undefined;
-        const text = isCmd ? line.cmd : line.out;
-        if (isCmd) div.className = 'is-cmd';
-        heroTerminal.appendChild(div);
-
-        if (!isCmd || text === '') {
-          div.textContent = text;
-          lineIndex += 1;
-          setTimeout(typeLine, LINE_PAUSE_MS);
-          return;
-        }
-
-        let charIndex = 0;
-        (function typeChar() {
-          div.textContent = text.slice(0, charIndex);
-          charIndex += 1;
-          if (charIndex <= text.length) {
-            setTimeout(typeChar, CHAR_MS);
-          } else {
-            lineIndex += 1;
-            setTimeout(typeLine, LINE_PAUSE_MS);
-          }
-        })();
-      }
-
-      typeLine();
+    function formatPresence(count) {
+      if (count === 'unavailable') return 'live count unavailable';
+      if (count === null) return 'counting…';
+      return count === 1 ? '1 person here right now' : count + ' people here right now';
     }
+
+    heroTerminal.textContent = '';
+
+    const clockLine = document.createElement('div');
+    clockLine.className = 'hero-terminal__clock';
+    heroTerminal.appendChild(clockLine);
+
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+        timeZoneName: 'short',
+      });
+      clockLine.textContent = time;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    const line = document.createElement('div');
+    line.className = 'hero-terminal__live';
+    const dot = document.createElement('span');
+    dot.className = 'hero-terminal__live-dot';
+    const label = document.createElement('span');
+    label.textContent = formatPresence(presenceCount);
+    line.appendChild(dot);
+    line.appendChild(label);
+    heroTerminal.appendChild(line);
+    onPresence((count) => {
+      label.textContent = formatPresence(count);
+    });
+
+    const cursor = document.createElement('span');
+    cursor.className = 'hero-terminal__cursor';
+    heroTerminal.appendChild(cursor);
   }
 })();
