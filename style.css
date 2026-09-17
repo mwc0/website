@@ -1,8 +1,14 @@
-:root {
+/* Dark is the default. The same values are reapplied to the game screens, so
+   Snake and Driftwalk stay dark displays set into a light page. */
+:root,
+.snake__stage,
+.tunnel__stage {
+  color-scheme: dark;
   --bg: #0a0b0a;
   --bg-panel: #131513;
   --bg-panel-2: #101210;
   --bg-well: #0d0f0d;
+  --bg-bar-focus: #161a17;
   --border: rgba(255, 255, 255, 0.09);
   --border-strong: rgba(255, 255, 255, 0.18);
   --text: #eef2ef;
@@ -13,11 +19,25 @@
   --accent-soft-strong: rgba(0, 204, 0, 0.20);
   --accent-ink: #06110a;
   --warn: #e2c14c;
+  --warn-ink: #06110a;
   --danger: #ff6b5e;
+  --dot: rgba(255, 255, 255, 0.14);
+  --tint: rgba(255, 255, 255, 0.03);
+
+  --shadow-panel: 0 30px 80px -30px rgba(0, 0, 0, 0.75);
+  --shadow-float: 0 40px 90px -20px rgba(0, 0, 0, 0.85);
+  --shadow-lifted: 0 60px 120px -24px rgba(0, 0, 0, 0.9);
+  --shadow-drawer: 24px 0 60px -24px rgba(0, 0, 0, 0.8);
+  --grain-opacity: 0.032;
+  --grid-opacity: 0.26;
+  --overlay: rgba(10, 11, 10, 0.88);
 
   --wordle-correct: var(--accent);
   --wordle-present: var(--warn);
   --wordle-absent: rgba(255, 255, 255, 0.06);
+}
+
+:root {
 
   --radius-lg: 14px;
   --radius-md: 8px;
@@ -28,6 +48,46 @@
   --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
   --press-scale: 0.97;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light: paper-white panels on a faint grey desk. The accent is the favicon's
+   green taken darker, so it still passes as text on white (5.2:1). */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f1f2ee;
+  --bg-panel: #ffffff;
+  --bg-panel-2: #f6f7f4;
+  --bg-well: #f8f9f6;
+  --bg-bar-focus: #eceee9;
+  --border: rgba(16, 24, 18, 0.11);
+  --border-strong: rgba(16, 24, 18, 0.22);
+  --text: #121613;
+  --text-dim: #56605a;
+  --text-faint: #7b847e;
+  --accent: #007f00;
+  --accent-soft: rgba(0, 127, 0, 0.09);
+  --accent-soft-strong: rgba(0, 127, 0, 0.18);
+  --accent-ink: #ffffff;
+  --warn: #e2b53c;
+  --warn-ink: #1a1405;
+  --danger: #c8352a;
+  --dot: rgba(16, 24, 18, 0.16);
+  --tint: rgba(16, 24, 18, 0.03);
+
+  --shadow-panel: 0 24px 60px -32px rgba(24, 34, 26, 0.28);
+  --shadow-float: 0 30px 70px -28px rgba(24, 34, 26, 0.34);
+  --shadow-lifted: 0 44px 90px -30px rgba(24, 34, 26, 0.42);
+  --shadow-drawer: 18px 0 44px -24px rgba(24, 34, 26, 0.3);
+  --grain-opacity: 0.018;
+  --grid-opacity: 0.13;
+  --overlay: rgba(248, 249, 246, 0.9);
+
+  --wordle-absent: rgba(16, 24, 18, 0.07);
+}
+
+::selection {
+  background: var(--accent-soft-strong);
+  color: var(--text);
 }
 
 * {
@@ -63,7 +123,7 @@ a {
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 44px 44px;
-  opacity: 0.26;
+  opacity: var(--grid-opacity);
 }
 
 /* Fine film grain over the whole page. Breaks up the flat panel fills so the
@@ -74,7 +134,7 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.032;
+  opacity: var(--grain-opacity);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -100,7 +160,7 @@ body::after {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.75);
+  box-shadow: var(--shadow-panel);
   overflow: hidden;
   position: relative;
 }
@@ -128,7 +188,7 @@ body::after {
 .console.is-floating {
   position: fixed;
   margin: 0;
-  box-shadow: 0 40px 90px -20px rgba(0, 0, 0, 0.85);
+  box-shadow: var(--shadow-float);
   resize: none;
   overflow: auto;
   min-width: 300px;
@@ -194,7 +254,7 @@ body::after {
   height: 10px;
   border-radius: 50%;
   display: inline-block;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--dot);
 }
 
 .console__title {
@@ -305,7 +365,7 @@ body::after {
   border: 1px solid var(--border);
   border-left: none;
   border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-  box-shadow: 24px 0 60px -24px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-drawer);
 }
 
 .taskbar.is-open {
@@ -785,7 +845,7 @@ body.is-interacting {
   gap: 8px;
   padding: 20px;
   text-align: center;
-  background: rgba(10, 11, 10, 0.88);
+  background: var(--overlay);
   cursor: pointer;
   transition: opacity 0.2s ease;
   z-index: 5;
@@ -894,7 +954,7 @@ body.is-interacting {
 
 .desktop-icon.is-open {
   border-color: var(--border-strong);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--tint);
 }
 
 .desktop-icon__glyph {
@@ -924,7 +984,7 @@ body.is-interacting {
 }
 
 .window.is-focused .console__bar {
-  background: #161a17;
+  background: var(--bg-bar-focus);
   border-bottom-color: var(--border-strong);
 }
 
@@ -955,7 +1015,7 @@ body.is-interacting {
 
 /* Picked up: the window lifts off the desktop while it's held */
 .console.is-lifted {
-  box-shadow: 0 60px 120px -24px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--border-strong);
+  box-shadow: var(--shadow-lifted), 0 0 0 1px var(--border-strong);
 }
 
 /* The close dot is the only one that does anything, so it is the only one that
@@ -1249,7 +1309,7 @@ body.is-interacting {
 .wordle__tile--present {
   background: var(--wordle-present);
   border-color: var(--wordle-present);
-  color: var(--accent-ink);
+  color: var(--warn-ink);
 }
 
 .wordle__tile--absent {
@@ -1313,7 +1373,7 @@ body.is-interacting {
 .wordle__key--present {
   background: var(--wordle-present);
   border-color: var(--wordle-present);
-  color: var(--accent-ink);
+  color: var(--warn-ink);
 }
 
 .wordle__key--absent {
@@ -1540,6 +1600,82 @@ body.is-interacting {
 }
 
 /* ============================================================ */
+/* Theme toggle: fixed top right on every page                    */
+/* ============================================================ */
+
+/* A two-position switch rather than a single icon, so the current theme and
+   the other one are both visible and the thumb shows which is on. */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-panel);
+  color: var(--text-faint);
+  cursor: pointer;
+  view-transition-name: theme-toggle;
+  transition: border-color 0.15s ease, scale 0.2s var(--ease);
+}
+
+.theme-toggle:hover {
+  border-color: var(--border-strong);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.theme-toggle__icon {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 26px;
+  padding: 5px 7px;
+  transition: color 0.2s ease;
+}
+
+.theme-toggle__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 30px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--accent-soft-strong);
+  transition: transform 0.36s var(--ease-out), background-color 0.2s ease;
+}
+
+/* Dark: thumb under the moon (left). Light: slides under the sun (right). */
+.theme-toggle[aria-checked="false"] .theme-toggle__icon--moon,
+.theme-toggle[aria-checked="true"] .theme-toggle__icon--sun {
+  color: var(--accent);
+}
+
+.theme-toggle[aria-checked="true"] .theme-toggle__thumb {
+  transform: translateX(30px);
+}
+
+.theme-toggle:active {
+  scale: 0.94;
+  transition-duration: 0.08s;
+}
+
+@media (max-width: 560px) {
+  .theme-toggle {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+/* ============================================================ */
 /* Page continuity: a game icon carries across the page change    */
 /* ============================================================ */
 
@@ -1634,7 +1770,8 @@ body.is-interacting {
   .taskbar__arrow,
   .taskbar__panel,
   .btn,
-  .converter__swap {
+  .converter__swap,
+  .theme-toggle__thumb {
     transition: none !important;
     animation: none !important;
   }
@@ -1648,13 +1785,29 @@ body.is-interacting {
 }
 
 @media (prefers-contrast: more) {
-  :root {
+  :root[data-theme="light"] {
+    --border: rgba(16, 24, 18, 0.34);
+    --border-strong: rgba(16, 24, 18, 0.6);
+    --text-dim: #3d4540;
+    --text-faint: #56605a;
+  }
+  :root:not([data-theme="light"]),
+  .snake__stage,
+  .tunnel__stage {
     --border: rgba(255, 255, 255, 0.28);
     --border-strong: rgba(255, 255, 255, 0.5);
     --text-dim: #b7c2bb;
     --text-faint: #8b968f;
   }
-  .game-overlay {
-    background: rgba(10, 11, 10, 0.96);
+}
+
+@media (prefers-contrast: more) {
+  :root:not([data-theme="light"]),
+  .snake__stage,
+  .tunnel__stage {
+    --overlay: rgba(10, 11, 10, 0.96);
+  }
+  :root[data-theme="light"] {
+    --overlay: rgba(248, 249, 246, 0.97);
   }
 }

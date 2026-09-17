@@ -52,7 +52,9 @@
   // ---- palette, read once from the stylesheet so the game tracks the theme ----
 
   function cssVar(name, fallback) {
-    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    // Read from the canvas, not the root: the game screen keeps its own dark
+    // palette when the page is in the light theme.
+    const v = getComputedStyle(canvas).getPropertyValue(name).trim();
     return v || fallback;
   }
 

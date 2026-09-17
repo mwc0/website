@@ -237,6 +237,60 @@
     });
   }
 
+  // ---- Theme toggle ----
+  // The <head> script already applied the theme before paint; this keeps the
+  // switch in sync, saves an explicit choice, and follows the system setting
+  // for anyone who has not made one.
+  const themeToggle = document.getElementById('themeToggle');
+  const root = document.documentElement;
+  const systemLight = window.matchMedia('(prefers-color-scheme: light)');
+
+  function savedTheme() {
+    try {
+      return localStorage.getItem('theme');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function syncToggle() {
+    if (themeToggle) {
+      themeToggle.setAttribute('aria-checked', String(root.dataset.theme === 'light'));
+    }
+  }
+
+  function applyTheme(theme) {
+    if (root.dataset.theme === theme) return;
+    const swap = () => {
+      root.dataset.theme = theme;
+      syncToggle();
+    };
+    // Cross-fade rather than jumping from dark to bright in a single frame.
+    if (document.startViewTransition && !prefersReducedMotion) {
+      document.startViewTransition(swap);
+    } else {
+      swap();
+    }
+  }
+
+  syncToggle();
+
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const next = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('theme', next);
+      } catch (e) {
+        // storage unavailable: the switch still works for this page
+      }
+      applyTheme(next);
+    });
+  }
+
+  systemLight.addEventListener('change', (e) => {
+    if (!savedTheme()) applyTheme(e.matches ? 'light' : 'dark');
+  });
+
   // ---- Live visitor presence (Supabase Realtime) ----
   const SUPABASE_URL = 'https://haeqrrxqwksfuawyhwtv.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_s7W8VMkmepZZ62M-msXHSg_QDRzajCI';

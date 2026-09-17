@@ -35,7 +35,7 @@ window.Desktop = (function () {
       const w = Math.min(window.innerWidth - 24, width);
       el.style.width = w + 'px';
       el.style.left = Math.round((window.innerWidth - w) / 2) + 'px';
-      el.style.top = '16px';
+      el.style.top = '60px'; // clear the theme toggle pinned top right
       return;
     }
 
