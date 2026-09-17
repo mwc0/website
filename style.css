@@ -8,9 +8,9 @@
   --text: #eef2ef;
   --text-dim: #8b968f;
   --text-faint: #5a635e;
-  --accent: #4bcf8a;
-  --accent-soft: rgba(75, 207, 138, 0.11);
-  --accent-soft-strong: rgba(75, 207, 138, 0.20);
+  --accent: #00cc00;
+  --accent-soft: rgba(0, 204, 0, 0.11);
+  --accent-soft-strong: rgba(0, 204, 0, 0.20);
   --accent-ink: #06110a;
   --warn: #e2c14c;
   --danger: #ff6b5e;
@@ -27,6 +27,7 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
   --press-scale: 0.97;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -505,6 +506,19 @@ body.is-interacting {
   border-radius: 50%;
   background: var(--accent);
   flex-shrink: 0;
+}
+
+/* The count rolls: old and new numbers share one grid cell while they pass,
+   so the line never reflows mid-change. */
+.hero-terminal__count {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-terminal__count > span {
+  grid-area: 1 / 1;
 }
 
 /* ---- Showcase: asymmetric games / tools panels ---- */
@@ -1523,6 +1537,54 @@ body.is-interacting {
   .console__footer {
     padding: 12px 18px 18px;
   }
+}
+
+/* ============================================================ */
+/* Page continuity: a game icon carries across the page change    */
+/* ============================================================ */
+
+/* Same view-transition-name on both pages, so the browser flies the home
+   page's icon into its slot on the desktop (and back again). The window then
+   grows out of it; desktop.js waits for the flight to land first. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+.showcase__game[href$="open=snake"] .showcase__game-icon,
+[data-open="snake"] .desktop-icon__glyph {
+  view-transition-name: game-snake;
+}
+.showcase__game[href$="open=wordle"] .showcase__game-icon,
+[data-open="wordle"] .desktop-icon__glyph {
+  view-transition-name: game-wordle;
+}
+.showcase__game[href$="open=tunnel"] .showcase__game-icon,
+[data-open="tunnel"] .desktop-icon__glyph {
+  view-transition-name: game-tunnel;
+}
+
+/* The nav handle exists on every page in the same place: hold it still
+   instead of letting it cross-fade with the rest of the page. */
+.side-nav {
+  view-transition-name: site-nav;
+}
+
+::view-transition-group(game-snake),
+::view-transition-group(game-wordle),
+::view-transition-group(game-tunnel) {
+  animation-duration: 0.52s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Stagger the three by a beat so they read as individual objects moving */
+::view-transition-group(game-wordle) { animation-delay: 0.03s; }
+::view-transition-group(game-tunnel) { animation-delay: 0.06s; }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
 }
 
 /* ============================================================ */

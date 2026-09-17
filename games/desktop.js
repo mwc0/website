@@ -221,8 +221,34 @@ window.Desktop = (function () {
     focused = null;
   });
 
+  // Arriving from a game link on the home page, the icon flies into its slot
+  // in a cross-page view transition. Open the window once it has landed, so it
+  // visibly grows out of the icon rather than racing it.
   const wanted = new URLSearchParams(location.search).get('open');
-  if (wanted && entries.has(wanted)) open(wanted);
+  if (wanted && entries.has(wanted)) {
+    let opened = false;
+    const openWanted = () => {
+      if (opened) return;
+      opened = true;
+      open(wanted);
+    };
+
+    const afterArrival = (transition) => {
+      if (transition) transition.finished.then(openWanted, openWanted);
+      else openWanted();
+    };
+
+    // index.html records the reveal in <head>; it may or may not have
+    // happened yet by the time this runs.
+    if (window.desktopArrival !== undefined) {
+      afterArrival(window.desktopArrival);
+    } else if ('onpagereveal' in window) {
+      window.addEventListener('pagereveal', (e) => afterArrival(e.viewTransition), { once: true });
+      setTimeout(openWanted, 1500); // never strand the window if the event is missed
+    } else {
+      openWanted();
+    }
+  }
 
   return { open: open, close: close, focus: focus, hasFocus: hasFocus, isOpen: isOpen };
 })();

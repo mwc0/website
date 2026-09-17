@@ -71,8 +71,8 @@
 
   function readPalette() {
     palette.board = cssVar('--bg-well', '#0d0f0d');
-    palette.accent = cssVar('--accent', '#4bcf8a');
-    palette.accentRgb = hexToRgb(palette.accent, [75, 207, 138]);
+    palette.accent = cssVar('--accent', '#00cc00');
+    palette.accentRgb = hexToRgb(palette.accent, [0, 204, 0]);
     palette.food = cssVar('--warn', '#e2c14c');
     palette.foodRgb = hexToRgb(palette.food, [226, 193, 76]);
     palette.danger = cssVar('--danger', '#ff6b5e');
@@ -379,7 +379,28 @@
     }
   }
 
+  // Rows are keyed by what they show, with a counter for identical entries,
+  // so the same score can be found before and after a re-render.
+  function rowKeys(rows) {
+    const seen = {};
+    return rows.map((row) => {
+      const base = row.name + '|' + row.score;
+      seen[base] = (seen[base] || 0) + 1;
+      return base + '|' + seen[base];
+    });
+  }
+
   function renderBoard(highlight) {
+    // FLIP only for a fresh submission: rows your score pushed down slide
+    // there, and your row writes itself in. A plain load just appears.
+    const animate = Boolean(highlight) && !reduceMotion;
+    const before = new Map();
+    if (animate) {
+      boardList.querySelectorAll('.leaderboard__row').forEach((li) => {
+        before.set(li.dataset.key, li.getBoundingClientRect().top);
+      });
+    }
+
     boardList.innerHTML = '';
 
     if (!boardRows.length) {
@@ -389,14 +410,23 @@
 
     boardStatus.textContent = '';
     let marked = false;
+    const keys = rowKeys(boardRows);
+    const ease = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
     boardRows.forEach((row, i) => {
       const li = document.createElement('li');
       li.className = 'leaderboard__row';
+      li.dataset.key = keys[i];
 
       if (!marked && highlight && row.name === highlight.name && row.score === highlight.score) {
         li.classList.add('is-you');
         marked = true;
+        if (animate) {
+          li.animate([
+            { clipPath: 'inset(0 100% 0 0 round 6px)' },
+            { clipPath: 'inset(0 0 0 0 round 6px)' },
+          ], { duration: 520, delay: 140, easing: ease, fill: 'backwards' });
+        }
       }
 
       const rank = document.createElement('span');
@@ -413,6 +443,16 @@
 
       li.append(rank, name, value);
       boardList.appendChild(li);
+
+      if (animate && before.has(li.dataset.key) && !li.classList.contains('is-you')) {
+        const shift = before.get(li.dataset.key) - li.getBoundingClientRect().top;
+        if (shift) {
+          li.animate([
+            { transform: `translateY(${shift}px)` },
+            { transform: 'none' },
+          ], { duration: 420, easing: ease });
+        }
+      }
     });
   }
 

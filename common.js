@@ -280,10 +280,10 @@
   // ---- Hero terminal: live visitor count (home page only) ----
   const heroTerminal = document.getElementById('heroTerminal');
   if (heroTerminal) {
-    function formatPresence(count) {
+    function describePresence(count) {
       if (count === 'unavailable') return 'live count unavailable';
       if (count === null) return 'counting…';
-      return count === 1 ? '1 person here right now' : count + ' people here right now';
+      return count === 1 ? ' person here right now' : ' people here right now';
     }
 
     heroTerminal.textContent = '';
@@ -311,13 +311,58 @@
     const dot = document.createElement('span');
     dot.className = 'hero-terminal__live-dot';
     const label = document.createElement('span');
-    label.textContent = formatPresence(presenceCount);
+    const countEl = document.createElement('span');
+    countEl.className = 'hero-terminal__count';
+    const words = document.createElement('span');
+    label.append(countEl, words);
     line.appendChild(dot);
     line.appendChild(label);
     heroTerminal.appendChild(line);
-    onPresence((count) => {
-      label.textContent = formatPresence(count);
-    });
+
+    // The number rolls in the direction it moved: up when someone arrives,
+    // down when someone leaves. The first real count just appears.
+    let shown = null;
+    function showCount(count) {
+      words.textContent = describePresence(count);
+      const isNumber = typeof count === 'number';
+      const next = isNumber ? String(count) : '';
+
+      if (!isNumber || typeof shown !== 'number' || count === shown || prefersReducedMotion) {
+        countEl.replaceChildren();
+        if (next) {
+          const span = document.createElement('span');
+          span.textContent = next;
+          countEl.appendChild(span);
+        }
+        shown = count;
+        return;
+      }
+
+      const dir = count > shown ? 1 : -1;
+      const outgoing = countEl.lastElementChild;
+      const incoming = document.createElement('span');
+      incoming.textContent = next;
+      countEl.appendChild(incoming);
+      shown = count;
+
+      const css = getComputedStyle(document.documentElement);
+      const accent = css.getPropertyValue('--accent').trim();
+      const text = css.getPropertyValue('--text').trim();
+      const timing = { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'both' };
+      incoming.animate([
+        { transform: `translateY(${dir * 100}%)`, opacity: 0, color: accent },
+        { transform: 'none', opacity: 1, color: accent, offset: 0.6 },
+        { transform: 'none', opacity: 1, color: text },
+      ], { ...timing, duration: 900 }).finished.then((a) => a.cancel(), () => {});
+      if (outgoing) {
+        outgoing.animate([
+          { transform: 'none', opacity: 1 },
+          { transform: `translateY(${dir * -100}%)`, opacity: 0 },
+        ], { ...timing, duration: 260, easing: 'cubic-bezier(0.5, 0, 0.75, 0)' })
+          .finished.then(() => outgoing.remove(), () => outgoing.remove());
+      }
+    }
+    onPresence(showCount);
 
     const cursor = document.createElement('span');
     cursor.className = 'hero-terminal__cursor';

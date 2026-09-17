@@ -17,8 +17,15 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=9">
+<link rel="icon" type="image/x-icon" href="../images/favicon.ico?v=2">
+<link rel="stylesheet" href="../style.css?v=11">
+<script>
+  // Record how this page was revealed (with or without a cross-page view
+  // transition) before first paint, which can land before desktop.js loads.
+  addEventListener('pagereveal', function (e) {
+    window.desktopArrival = e.viewTransition || null;
+  }, { once: true });
+</script>
 </head>
 <body class="body--desktop">
 
@@ -191,11 +198,11 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../common.js?v=9"></script>
+  <script src="../common.js?v=10"></script>
   <script src="leaderboard.js?v=1"></script>
-  <script src="snake/snake.js?v=3"></script>
+  <script src="snake/snake.js?v=5"></script>
   <script src="wordle/wordle.js?v=2"></script>
-  <script src="tunnel/tunnel.js?v=3"></script>
-  <script src="desktop.js?v=2"></script>
+  <script src="tunnel/tunnel.js?v=4"></script>
+  <script src="desktop.js?v=3"></script>
 </body>
 </html>

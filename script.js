@@ -163,13 +163,34 @@
   // The arrows turn because the units swapped, and keep turning the same way
   // on every swap rather than flipping back.
   let swapTurn = 0;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Each unit visibly travels to the other side, so the swap reads as the two
+  // trading places rather than two labels silently changing. Works for the
+  // side-by-side and the stacked mobile layout alike, since it measures.
+  function travel(el, fromRect) {
+    const to = el.getBoundingClientRect();
+    el.animate([
+      { transform: `translate(${fromRect.left - to.left}px, ${fromRect.top - to.top}px)`, opacity: 1 },
+      // Thin out mid-flight: on the stacked layout the path crosses the result.
+      { opacity: 0.45, offset: 0.35 },
+      { transform: 'none', opacity: 1 },
+    ], { duration: 420, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+  }
+
   swapBtn.addEventListener('click', () => {
     swapTurn += 180;
     swapBtn.style.setProperty('--swap-turn', swapTurn + 'deg');
+    const fromRect = fromUnit.getBoundingClientRect();
+    const toRect = toUnit.getBoundingClientRect();
     const f = fromUnit.value;
     fromUnit.value = toUnit.value;
     toUnit.value = f;
     runConversion();
+    if (!reduceMotion && fromUnit.value !== toUnit.value) {
+      travel(fromUnit, toRect);
+      travel(toUnit, fromRect);
+    }
   });
 
   const formatButtons = Array.from(document.querySelectorAll('.converter__format-btn'));
