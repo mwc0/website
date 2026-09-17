@@ -97,11 +97,29 @@ window.Desktop = (function () {
     emit(entry.el, 'desktop:focus');
   }
 
+  // Point the scale animation at the icon, so a window visibly comes out of
+  // (and goes back into) the thing that opened it.
+  function anchorToIcon(entry, id) {
+    const icon = document.querySelector('[data-open="' + id + '"]');
+    if (!icon) return;
+    const r = icon.getBoundingClientRect();
+    const left = parseFloat(entry.el.style.left) || 0;
+    const top = parseFloat(entry.el.style.top) || 0;
+    entry.el.style.transformOrigin =
+      (r.left + r.width / 2 - left) + 'px ' + (r.top + r.height / 2 - top) + 'px';
+  }
+
+  const CLOSE_MS = 260; // a touch longer than the .is-away transition
+
   function open(id) {
     const entry = entries.get(id);
     if (!entry) return;
 
     if (!entry.open) {
+      // Reopened mid-close: cancel the hide and let the transition reverse
+      // from wherever it has got to.
+      const midClose = !entry.el.hidden;
+      clearTimeout(entry.hideTimer);
       entry.el.hidden = false;
       // Float it up front so common.js drags it without re-measuring, and so
       // it sits on the desktop rather than in the document flow.
@@ -115,6 +133,13 @@ window.Desktop = (function () {
         place(entry.el);
         entry.placed = true;
       }
+
+      anchorToIcon(entry, id);
+      if (!midClose) {
+        entry.el.classList.add('is-away');
+        void entry.el.offsetWidth; // commit the away state so the entry animates
+      }
+      entry.el.classList.remove('is-away');
 
       entry.open = true;
       const icon = document.querySelector('[data-open="' + id + '"]');
@@ -130,7 +155,11 @@ window.Desktop = (function () {
     if (!entry || !entry.open) return;
 
     entry.open = false;
-    entry.el.hidden = true;
+    anchorToIcon(entry, id);
+    entry.el.classList.add('is-away');
+    entry.hideTimer = setTimeout(() => {
+      entry.el.hidden = true;
+    }, CLOSE_MS);
     entry.el.classList.remove('is-focused');
     const icon = document.querySelector('[data-open="' + id + '"]');
     if (icon) icon.classList.remove('is-open');

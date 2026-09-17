@@ -160,7 +160,12 @@
     el.addEventListener('change', runConversion);
   });
 
+  // The arrows turn because the units swapped, and keep turning the same way
+  // on every swap rather than flipping back.
+  let swapTurn = 0;
   swapBtn.addEventListener('click', () => {
+    swapTurn += 180;
+    swapBtn.style.setProperty('--swap-turn', swapTurn + 'deg');
     const f = fromUnit.value;
     fromUnit.value = toUnit.value;
     toUnit.value = f;

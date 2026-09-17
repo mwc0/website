@@ -18,6 +18,52 @@
     panel.style.zIndex = String(++topZ);
   }
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Past a bound the window keeps following, but less the further it goes, so
+  // the edge reads as soft resistance rather than a wall.
+  function rubberband(value, min, max, dimension) {
+    const c = 0.55;
+    const band = (over) => (over * dimension * c) / (dimension + c * over);
+    if (value < min) return min - band(min - value);
+    if (value > max) return max + band(value - max);
+    return value;
+  }
+
+  // Critically damped spring (no overshoot), one per axis so X and Y settle
+  // independently. Starts from the live position and the pointer's velocity,
+  // so there is no seam between letting go and the window moving home.
+  const SPRING_RESPONSE = 0.4;
+  function settle(panel, to, velocity) {
+    const omega = (2 * Math.PI) / SPRING_RESPONSE;
+    const axes = [
+      { prop: 'left', x: parseFloat(panel.style.left), v: velocity.x, t: to.left },
+      { prop: 'top', x: parseFloat(panel.style.top), v: velocity.y, t: to.top },
+    ];
+    let last = performance.now();
+
+    function step(now) {
+      const dt = Math.min((now - last) / 1000, 1 / 30);
+      last = now;
+      let moving = false;
+      axes.forEach((a) => {
+        const accel = -omega * omega * (a.x - a.t) - 2 * omega * a.v;
+        a.v += accel * dt;
+        a.x += a.v * dt;
+        if (Math.abs(a.x - a.t) < 0.5 && Math.abs(a.v) < 10) {
+          a.x = a.t;
+          a.v = 0;
+        } else {
+          moving = true;
+        }
+        panel.style[a.prop] = a.x + 'px';
+      });
+      panel._settleRaf = moving ? requestAnimationFrame(step) : null;
+    }
+
+    panel._settleRaf = requestAnimationFrame(step);
+  }
+
   function makeDraggable(panel) {
     const handle = panel.querySelector('.console__bar');
     if (!handle) return;
@@ -28,6 +74,10 @@
       // swallow their click, so leave them alone.
       if (e.target.closest('button, a')) return;
 
+      // Grabbing a window that is still springing back catches it mid-flight.
+      cancelAnimationFrame(panel._settleRaf);
+      panel._settleRaf = null;
+
       const rect = panel.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
       const offsetY = e.clientY - rect.top;
@@ -36,30 +86,64 @@
       bringToFront(panel);
       document.body.classList.add('is-interacting');
       handle.classList.add('is-dragging');
+      panel.classList.add('is-lifted');
       handle.setPointerCapture(e.pointerId);
 
       const panelRect = panel.getBoundingClientRect();
+      const minVisible = 60;
+      const bounds = {
+        minLeft: minVisible - panelRect.width,
+        maxLeft: window.innerWidth - minVisible,
+        minTop: 0,
+        maxTop: window.innerHeight - minVisible,
+      };
+      const history = [{ x: e.clientX, y: e.clientY, t: e.timeStamp }];
 
       function onMove(ev) {
-        const minVisible = 60;
-        let left = ev.clientX - offsetX;
-        let top = ev.clientY - offsetY;
-        left = Math.min(Math.max(left, minVisible - panelRect.width), window.innerWidth - minVisible);
-        top = Math.min(Math.max(top, 0), window.innerHeight - minVisible);
+        history.push({ x: ev.clientX, y: ev.clientY, t: ev.timeStamp });
+        if (history.length > 5) history.shift();
+
+        const left = rubberband(ev.clientX - offsetX, bounds.minLeft, bounds.maxLeft, window.innerWidth);
+        const top = rubberband(ev.clientY - offsetY, bounds.minTop, bounds.maxTop, window.innerHeight);
         panel.style.left = left + 'px';
         panel.style.top = top + 'px';
       }
 
       function onUp(ev) {
         handle.classList.remove('is-dragging');
+        panel.classList.remove('is-lifted');
         document.body.classList.remove('is-interacting');
-        handle.releasePointerCapture(ev.pointerId);
+        if (handle.hasPointerCapture(ev.pointerId)) handle.releasePointerCapture(ev.pointerId);
         handle.removeEventListener('pointermove', onMove);
         handle.removeEventListener('pointerup', onUp);
+        handle.removeEventListener('pointercancel', onUp);
+
+        const left = parseFloat(panel.style.left);
+        const top = parseFloat(panel.style.top);
+        const home = {
+          left: Math.min(Math.max(left, bounds.minLeft), bounds.maxLeft),
+          top: Math.min(Math.max(top, bounds.minTop), bounds.maxTop),
+        };
+        if (home.left === left && home.top === top) return;
+
+        if (prefersReducedMotion) {
+          panel.style.left = home.left + 'px';
+          panel.style.top = home.top + 'px';
+          return;
+        }
+
+        const first = history[0];
+        const lastSample = history[history.length - 1];
+        const dt = (lastSample.t - first.t) / 1000;
+        const velocity = dt > 0
+          ? { x: (lastSample.x - first.x) / dt, y: (lastSample.y - first.y) / dt }
+          : { x: 0, y: 0 };
+        settle(panel, home, velocity);
       }
 
       handle.addEventListener('pointermove', onMove);
       handle.addEventListener('pointerup', onUp);
+      handle.addEventListener('pointercancel', onUp);
     });
   }
 

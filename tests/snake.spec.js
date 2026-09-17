@@ -68,7 +68,9 @@ test.describe('Games desktop', () => {
   test('a reopened window returns to where it was left', async ({ page }) => {
     await page.goto('/games/?open=snake');
     const win = page.locator('[data-window="snake"]');
-    const box = (el) => el.evaluate((n) => {
+    // Windows scale in from their icon, so measure once that has settled.
+    const box = (el) => el.evaluate(async (n) => {
+      await Promise.all(n.getAnimations().map((a) => a.finished));
       const r = n.getBoundingClientRect();
       return { left: Math.round(r.left), top: Math.round(r.top), width: Math.round(r.width) };
     });

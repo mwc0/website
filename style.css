@@ -25,6 +25,8 @@
   --font-mono: 'IBM Plex Mono', monospace;
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
+  --press-scale: 0.97;
 }
 
 * {
@@ -244,10 +246,15 @@ body::after {
 }
 
 .taskbar {
+  --panel-w: 160px;
   position: relative;
   display: flex;
   align-items: center;
   pointer-events: auto;
+  /* Closed, the panel sits just past the right edge; opening slides the whole
+     drawer left, and closing retraces the same path. */
+  transform: translateX(var(--panel-w));
+  transition: transform 0.4s var(--ease);
 }
 
 .taskbar__handle {
@@ -266,12 +273,14 @@ body::after {
   cursor: pointer;
   position: relative;
   z-index: 2;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, scale 0.2s var(--ease);
 }
 
-.taskbar__handle:hover {
-  color: var(--accent);
-  border-color: var(--border-strong);
+@media (hover: hover) {
+  .taskbar__handle:hover {
+    color: var(--accent);
+    border-color: var(--border-strong);
+  }
 }
 
 .taskbar__arrow {
@@ -280,7 +289,6 @@ body::after {
   transition: transform 0.35s var(--ease);
 }
 
-.side-nav:hover .taskbar__arrow,
 .taskbar.is-open .taskbar__arrow {
   transform: rotate(180deg);
 }
@@ -289,22 +297,28 @@ body::after {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 0;
-  padding: 18px 0;
-  overflow: hidden;
+  width: var(--panel-w);
+  padding: 18px;
   white-space: nowrap;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-left: none;
   border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   box-shadow: 24px 0 60px -24px rgba(0, 0, 0, 0.8);
-  transition: width 0.35s var(--ease), padding 0.35s var(--ease);
 }
 
-.side-nav:hover .taskbar__panel,
-.taskbar.is-open .taskbar__panel {
-  width: 160px;
-  padding: 18px;
+.taskbar.is-open {
+  transform: none;
+}
+
+/* Hover-to-open only where hover is real, so it can't stick open on touch */
+@media (hover: hover) {
+  .side-nav:hover .taskbar {
+    transform: none;
+  }
+  .side-nav:hover .taskbar__arrow {
+    transform: rotate(180deg);
+  }
 }
 
 .taskbar__link {
@@ -318,13 +332,15 @@ body::after {
   padding: 15px 14px;
   text-decoration: none;
   text-align: center;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, scale 0.2s var(--ease);
 }
 
-.taskbar__link:hover {
-  color: var(--accent-ink);
-  background: var(--accent);
-  border-color: var(--accent);
+@media (hover: hover) {
+  .taskbar__link:hover {
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
 }
 
 body.is-interacting {
@@ -403,12 +419,8 @@ body.is-interacting {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.12s ease, filter 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: scale 0.2s var(--ease), filter 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
-}
-
-.btn:active {
-  transform: scale(0.98);
 }
 
 .btn--primary {
@@ -543,7 +555,7 @@ body.is-interacting {
   border-radius: var(--radius-md);
   text-decoration: none;
   color: var(--text);
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, scale 0.2s var(--ease);
 }
 
 .showcase__game:hover {
@@ -594,7 +606,7 @@ body.is-interacting {
   font-size: 12.5px;
   color: var(--text-dim);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color 0.15s ease, scale 0.2s var(--ease);
 }
 
 .showcase__link:hover {
@@ -856,7 +868,7 @@ body.is-interacting {
   border-radius: var(--radius-md);
   cursor: pointer;
   font-family: var(--font-mono);
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, scale 0.2s var(--ease);
 }
 
 .desktop-icon:hover,
@@ -906,6 +918,32 @@ body.is-interacting {
   opacity: 0.94;
 }
 
+/* desktop.js points transform-origin at the window's icon. Transitions
+   retarget from the live value, so reopening mid-close simply reverses. */
+.window {
+  transition:
+    opacity 0.32s var(--ease),
+    transform 0.42s var(--ease),
+    filter 0.32s var(--ease),
+    box-shadow 0.2s ease;
+}
+
+.window.is-away {
+  opacity: 0;
+  transform: scale(0.88);
+  filter: blur(6px);
+  pointer-events: none;
+  transition:
+    opacity 0.2s var(--ease-in),
+    transform 0.22s var(--ease-in),
+    filter 0.2s var(--ease-in);
+}
+
+/* Picked up: the window lifts off the desktop while it's held */
+.console.is-lifted {
+  box-shadow: 0 60px 120px -24px rgba(0, 0, 0, 0.9), 0 0 0 1px var(--border-strong);
+}
+
 /* The close dot is the only one that does anything, so it is the only one that
    carries colour and reacts to the pointer. */
 .window__close {
@@ -914,7 +952,7 @@ body.is-interacting {
   cursor: pointer;
   position: relative;
   background: var(--danger);
-  transition: filter 0.15s ease;
+  transition: filter 0.15s ease, scale 0.2s var(--ease);
 }
 
 .window__close:hover {
@@ -1090,7 +1128,7 @@ body.is-interacting {
   border-radius: var(--radius-md);
   padding: 8px 16px;
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, scale 0.2s var(--ease);
 }
 
 .score-entry__btn:hover {
@@ -1239,15 +1277,11 @@ body.is-interacting {
   min-width: 0;
   max-width: 38px;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, scale 0.2s var(--ease), border-color 0.15s ease;
 }
 
 .wordle__key:hover {
   border-color: var(--border-strong);
-}
-
-.wordle__key:active {
-  transform: scale(0.94);
 }
 
 .wordle__key--wide {
@@ -1326,17 +1360,13 @@ body.is-interacting {
   border-radius: var(--radius-md);
   padding: 10px 22px;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, scale 0.2s var(--ease);
 }
 
 .tunnel__btn:hover {
   color: var(--accent-ink);
   background: var(--accent);
   border-color: var(--accent);
-}
-
-.tunnel__btn:active {
-  transform: scale(0.96);
 }
 
 /* ============================================================ */
@@ -1367,7 +1397,7 @@ body.is-interacting {
   border-radius: var(--radius-md);
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, scale 0.2s var(--ease);
 }
 
 .converter__tab:hover,
@@ -1457,7 +1487,8 @@ body.is-interacting {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transform: rotate(var(--swap-turn, 0deg));
+  transition: transform 0.45s var(--ease), scale 0.2s var(--ease), color 0.15s ease, border-color 0.15s ease;
 }
 
 .converter__swap svg {
@@ -1484,7 +1515,7 @@ body.is-interacting {
   .converter__swap {
     align-self: center;
     margin-top: 0;
-    transform: rotate(90deg); /* stacked layout, so the arrows point up and down */
+    transform: rotate(calc(var(--swap-turn, 0deg) + 90deg)); /* stacked layout, so the arrows point up and down */
   }
   .console__body {
     padding: 22px 18px 6px;
@@ -1493,6 +1524,41 @@ body.is-interacting {
     padding: 12px 18px 18px;
   }
 }
+
+/* ============================================================ */
+/* Press feedback                                                 */
+/* ============================================================ */
+
+/* The individual `scale` property composes with any other transform. The
+   press lands fast; release eases back on each element's slower transition. */
+.btn:active,
+.showcase__game:active,
+.showcase__link:active,
+.taskbar__link:active,
+.taskbar__handle:active,
+.desktop-icon:active,
+.converter__tab:active,
+.converter__format-btn:active,
+.score-entry__btn:active,
+.tunnel__btn:active {
+  scale: var(--press-scale);
+  transition-duration: 0.08s;
+}
+
+.wordle__key:active {
+  scale: 0.92;
+  transition-duration: 0.06s;
+}
+
+.converter__swap:active,
+.window__close:active {
+  scale: 0.85;
+  transition-duration: 0.08s;
+}
+
+/* ============================================================ */
+/* Accessibility preferences                                      */
+/* ============================================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .hero-terminal__cursor,
@@ -1505,8 +1571,28 @@ body.is-interacting {
   .taskbar,
   .taskbar__arrow,
   .taskbar__panel,
-  .btn {
+  .btn,
+  .converter__swap {
     transition: none !important;
     animation: none !important;
+  }
+  /* Windows cross-fade in place: no scale, no blur */
+  .window,
+  .window.is-away {
+    transform: none;
+    filter: none;
+    transition: opacity 0.18s ease;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border: rgba(255, 255, 255, 0.28);
+    --border-strong: rgba(255, 255, 255, 0.5);
+    --text-dim: #b7c2bb;
+    --text-faint: #8b968f;
+  }
+  .game-overlay {
+    background: rgba(10, 11, 10, 0.96);
   }
 }
