@@ -64,6 +64,12 @@
     panel._settleRaf = requestAnimationFrame(step);
   }
 
+  // Windows stop at the site header rather than sliding underneath it.
+  function headerHeight() {
+    const header = document.querySelector('.site-header');
+    return header ? header.offsetHeight : 0;
+  }
+
   function makeDraggable(panel) {
     const handle = panel.querySelector('.console__bar');
     if (!handle) return;
@@ -94,7 +100,7 @@
       const bounds = {
         minLeft: minVisible - panelRect.width,
         maxLeft: window.innerWidth - minVisible,
-        minTop: 0,
+        minTop: headerHeight(),
         maxTop: window.innerHeight - minVisible,
       };
       const history = [{ x: e.clientX, y: e.clientY, t: e.timeStamp }];
@@ -217,25 +223,7 @@
 
   // Shared so the games desktop can raise windows through the same z-index
   // counter this file uses for dragging, instead of running a rival one.
-  window.WindowChrome = { floatPanel, bringToFront };
-
-  // ---- Taskbar (tap-to-toggle for touch; CSS handles hover on desktop) ----
-  const taskbar = document.getElementById('taskbar');
-  const taskbarHandle = document.getElementById('taskbarHandle');
-
-  if (taskbar && taskbarHandle) {
-    taskbarHandle.addEventListener('click', () => {
-      const isOpen = taskbar.classList.toggle('is-open');
-      taskbarHandle.setAttribute('aria-expanded', String(isOpen));
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!taskbar.contains(e.target)) {
-        taskbar.classList.remove('is-open');
-        taskbarHandle.setAttribute('aria-expanded', 'false');
-      }
-    });
-  }
+  window.WindowChrome = { floatPanel, bringToFront, headerHeight };
 
   // ---- Theme toggle ----
   // The <head> script already applied the theme before paint; this keeps the

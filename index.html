@@ -28,11 +28,29 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
 
   <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="site-header__brand" href="./">matthew<em>.</em>quest</a>
+    <nav class="site-tabs" aria-label="Site">
+      <a class="site-tab" href="games/">games</a>
+      <a class="site-tab" href="tools/">tools</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
+      <span class="theme-toggle__thumb" aria-hidden="true"></span>
+      <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
 
   <div class="home">
     <section class="hero">
@@ -95,7 +113,7 @@
       <article class="showcase__panel" id="showcaseTools">
         <h2 class="showcase__panel-title">tools</h2>
         <p class="showcase__panel-desc">Length, weight and temperature, plus currency at whatever today's rate is.</p>
-        <a class="showcase__link" href="tools/" style="margin-top: 0;">
+        <a class="showcase__link showcase__link--flush" href="tools/">
           open converter
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -111,35 +129,7 @@
     </footer>
   </div>
 
-  <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
-    <span class="theme-toggle__thumb" aria-hidden="true"></span>
-    <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-    </svg>
-    <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
-      <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>
-  </button>
-
-  <div class="side-nav">
-    <div class="side-nav__trigger" aria-hidden="true"></div>
-    <nav class="taskbar" id="taskbar" aria-label="Site navigation">
-      <div class="taskbar__cluster">
-        <button class="taskbar__handle" id="taskbarHandle" type="button" aria-expanded="false" aria-label="Toggle navigation">
-          <svg class="taskbar__arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <div class="taskbar__panel">
-        <a class="taskbar__link" href="games/">games</a>
-        <a class="taskbar__link" href="tools/">tools</a>
-      </div>
-    </nav>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="common.js?v=11"></script>
+  <script src="common.js?v=12"></script>
 </body>
 </html>

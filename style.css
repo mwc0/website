@@ -13,7 +13,7 @@
   --border-strong: rgba(255, 255, 255, 0.18);
   --text: #eef2ef;
   --text-dim: #8b968f;
-  --text-faint: #5a635e;
+  --text-faint: #78817b;
   --accent: #00cc00;
   --accent-soft: rgba(0, 204, 0, 0.11);
   --accent-soft-strong: rgba(0, 204, 0, 0.20);
@@ -27,7 +27,6 @@
   --shadow-panel: 0 30px 80px -30px rgba(0, 0, 0, 0.75);
   --shadow-float: 0 40px 90px -20px rgba(0, 0, 0, 0.85);
   --shadow-lifted: 0 60px 120px -24px rgba(0, 0, 0, 0.9);
-  --shadow-drawer: 24px 0 60px -24px rgba(0, 0, 0, 0.8);
   --grain-opacity: 0.032;
   --grid-opacity: 0.26;
   --overlay: rgba(10, 11, 10, 0.88);
@@ -48,6 +47,7 @@
   --ease-in: cubic-bezier(0.5, 0, 0.75, 0);
   --press-scale: 0.97;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-h: 56px;
 }
 
 /* Light: paper-white panels on a faint grey desk. The accent is the favicon's
@@ -63,7 +63,7 @@
   --border-strong: rgba(16, 24, 18, 0.22);
   --text: #121613;
   --text-dim: #56605a;
-  --text-faint: #7b847e;
+  --text-faint: #667069;
   --accent: #007f00;
   --accent-soft: rgba(0, 127, 0, 0.09);
   --accent-soft-strong: rgba(0, 127, 0, 0.18);
@@ -77,7 +77,6 @@
   --shadow-panel: 0 24px 60px -32px rgba(24, 34, 26, 0.28);
   --shadow-float: 0 30px 70px -28px rgba(24, 34, 26, 0.34);
   --shadow-lifted: 0 44px 90px -30px rgba(24, 34, 26, 0.42);
-  --shadow-drawer: 18px 0 44px -24px rgba(24, 34, 26, 0.3);
   --grain-opacity: 0.018;
   --grid-opacity: 0.13;
   --overlay: rgba(248, 249, 246, 0.9);
@@ -110,6 +109,13 @@ body {
 
 a {
   color: inherit;
+}
+
+/* One focus ring for every control. Text fields keep their accent border
+   instead (see .converter__input and .score-entry__input). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ---- Ambient background: a plain graph-paper grid, shared by every page ---- */
@@ -149,7 +155,7 @@ body::after {
   gap: 24px;
   position: relative;
   z-index: 1;
-  padding: 32px 16px;
+  padding: calc(var(--header-h) + 24px) 16px 32px;
   min-height: 100vh;
   align-items: center;
   justify-content: center;
@@ -271,136 +277,79 @@ body::after {
   padding-bottom: 28px;
 }
 
-.console__footer {
-  padding: 14px 28px 20px;
-  font-size: 11px;
-  color: var(--text-dim);
-  border-top: 1px solid var(--border);
-}
+/* ---- Site header: a menu bar across the top of every page ---- */
 
-/* ---- Side nav dock: edge tab that expands into a link panel ---- */
-
-.side-nav {
+.site-header {
   position: fixed;
   top: 0;
+  left: 0;
   right: 0;
-  height: 100%;
-  z-index: 60;
+  z-index: 9000;
+  height: var(--header-h);
   display: flex;
   align-items: center;
-  pointer-events: none;
+  gap: 20px;
+  padding: 0 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  /* Same bar on every page: hold it still through page transitions */
+  view-transition-name: site-header;
 }
 
-.side-nav__trigger {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 96px;
-  pointer-events: auto;
-}
-
-@media (hover: none) {
-  .side-nav__trigger {
-    pointer-events: none;
-  }
-}
-
-.taskbar {
-  --panel-w: 160px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  pointer-events: auto;
-  /* Closed, the panel sits just past the right edge; opening slides the whole
-     drawer left, and closing retraces the same path. */
-  transform: translateX(var(--panel-w));
-  transition: transform 0.4s var(--ease);
-}
-
-.taskbar__handle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 56px;
-  height: 76px;
-  padding: 0;
-  color: var(--text-dim);
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-right: none;
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-  cursor: pointer;
-  position: relative;
-  z-index: 2;
-  transition: color 0.15s ease, border-color 0.15s ease, scale 0.2s var(--ease);
-}
-
-@media (hover: hover) {
-  .taskbar__handle:hover {
-    color: var(--accent);
-    border-color: var(--border-strong);
-  }
-}
-
-.taskbar__arrow {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.35s var(--ease);
-}
-
-.taskbar.is-open .taskbar__arrow {
-  transform: rotate(180deg);
-}
-
-.taskbar__panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: var(--panel-w);
-  padding: 18px;
-  white-space: nowrap;
-  background: var(--bg-panel);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-  box-shadow: var(--shadow-drawer);
-}
-
-.taskbar.is-open {
-  transform: none;
-}
-
-/* Hover-to-open only where hover is real, so it can't stick open on touch */
-@media (hover: hover) {
-  .side-nav:hover .taskbar {
-    transform: none;
-  }
-  .side-nav:hover .taskbar__arrow {
-    transform: rotate(180deg);
-  }
-}
-
-.taskbar__link {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.02em;
+.site-header__brand {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 15px 14px;
   text-decoration: none;
-  text-align: center;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, scale 0.2s var(--ease);
+  white-space: nowrap;
+  border-radius: 4px;
 }
 
-@media (hover: hover) {
-  .taskbar__link:hover {
-    color: var(--accent-ink);
-    background: var(--accent);
-    border-color: var(--accent);
+.site-header__brand em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.site-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-panel);
+}
+
+.site-tab {
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: 0.02em;
+  padding: 4px 14px;
+  border-radius: 999px;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.15s ease, background-color 0.15s ease, scale 0.2s var(--ease);
+}
+
+.site-tab:hover {
+  color: var(--text);
+}
+
+.site-tab[aria-current="page"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 400px) {
+  .site-header {
+    gap: 10px;
+    padding: 0 12px;
+  }
+  .site-header__brand {
+    font-size: 12px;
+  }
+  .site-tab {
+    padding: 4px 10px;
   }
 }
 
@@ -683,6 +632,11 @@ body.is-interacting {
   transition: color 0.15s ease, scale 0.2s var(--ease);
 }
 
+/* A panel with no list: the link follows the description directly */
+.showcase__link--flush {
+  margin-top: 0;
+}
+
 .showcase__link:hover {
   color: var(--accent);
 }
@@ -791,8 +745,11 @@ body.is-interacting {
     margin-left: 0;
   }
   .hero {
-    padding-top: 64px;
+    padding-top: calc(var(--header-h) + 40px);
     min-height: auto;
+  }
+  .hero__terminal .console__body {
+    min-height: 0;
   }
   .showcase {
     grid-template-columns: 1fr;
@@ -858,7 +815,7 @@ body.is-interacting {
 
 .game-overlay__title {
   font-family: var(--font-mono);
-  font-size: clamp(22px, 5vw, 28px);
+  font-size: clamp(24px, 5vw, 28px);
   margin: 0;
   color: var(--accent);
   text-transform: lowercase;
@@ -917,7 +874,7 @@ body.is-interacting {
   position: relative;
   z-index: 1;
   min-height: 100dvh;
-  padding: 24px 28px 28px;
+  padding: calc(var(--header-h) + 20px) 28px 28px;
 }
 
 .desktop__icons {
@@ -949,7 +906,6 @@ body.is-interacting {
 .desktop-icon:focus-visible {
   background: var(--accent-soft);
   border-color: var(--border);
-  outline: none;
 }
 
 .desktop-icon.is-open {
@@ -1052,7 +1008,7 @@ body.is-interacting {
 
 @media (max-width: 720px) {
   .desktop {
-    padding: 64px 18px 18px;
+    padding: calc(var(--header-h) + 16px) 18px 18px;
   }
   .desktop__icons {
     flex-direction: row;
@@ -1594,22 +1550,18 @@ body.is-interacting {
   .console__body {
     padding: 22px 18px 6px;
   }
-  .console__footer {
-    padding: 12px 18px 18px;
-  }
 }
 
 /* ============================================================ */
-/* Theme toggle: fixed top right on every page                    */
+/* Theme toggle: right-hand end of the site header               */
 /* ============================================================ */
 
 /* A two-position switch rather than a single icon, so the current theme and
    the other one are both visible and the thumb shows which is on. */
 .theme-toggle {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 9000;
+  position: relative;
+  margin-left: auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 0;
@@ -1617,20 +1569,13 @@ body.is-interacting {
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--bg-panel);
-  box-shadow: var(--shadow-panel);
   color: var(--text-faint);
   cursor: pointer;
-  view-transition-name: theme-toggle;
   transition: border-color 0.15s ease, scale 0.2s var(--ease);
 }
 
 .theme-toggle:hover {
   border-color: var(--border-strong);
-}
-
-.theme-toggle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
 }
 
 .theme-toggle__icon {
@@ -1668,13 +1613,6 @@ body.is-interacting {
   transition-duration: 0.08s;
 }
 
-@media (max-width: 560px) {
-  .theme-toggle {
-    top: 12px;
-    right: 12px;
-  }
-}
-
 /* ============================================================ */
 /* Page continuity: a game icon carries across the page change    */
 /* ============================================================ */
@@ -1699,12 +1637,6 @@ body.is-interacting {
 .showcase__game[href$="open=tunnel"] .showcase__game-icon,
 [data-open="tunnel"] .desktop-icon__glyph {
   view-transition-name: game-tunnel;
-}
-
-/* The nav handle exists on every page in the same place: hold it still
-   instead of letting it cross-fade with the rest of the page. */
-.side-nav {
-  view-transition-name: site-nav;
 }
 
 ::view-transition-group(game-snake),
@@ -1732,8 +1664,7 @@ body.is-interacting {
 .btn:active,
 .showcase__game:active,
 .showcase__link:active,
-.taskbar__link:active,
-.taskbar__handle:active,
+.site-tab:active,
 .desktop-icon:active,
 .converter__tab:active,
 .converter__format-btn:active,
@@ -1766,9 +1697,6 @@ body.is-interacting {
   .icon-tunnel span,
   .wordle__tile,
   .wordle__row--shake,
-  .taskbar,
-  .taskbar__arrow,
-  .taskbar__panel,
   .btn,
   .converter__swap,
   .theme-toggle__thumb {

@@ -24,6 +24,10 @@ window.Desktop = (function () {
     el.dispatchEvent(new CustomEvent(type));
   }
 
+  function headerTop() {
+    return chrome && chrome.headerHeight ? chrome.headerHeight() : 0;
+  }
+
   function isNarrow() {
     return window.innerWidth < 720;
   }
@@ -35,7 +39,14 @@ window.Desktop = (function () {
       const w = Math.min(window.innerWidth - 24, width);
       el.style.width = w + 'px';
       el.style.left = Math.round((window.innerWidth - w) / 2) + 'px';
-      el.style.top = '60px'; // clear the theme toggle pinned top right
+      // Below the icon row, never over it: covering the icons would leave
+      // no way to open another game or toggle this one shut.
+      const icons = document.querySelector('.desktop__icons');
+      const below = icons ? icons.getBoundingClientRect().bottom : headerTop();
+      const top = Math.round(below + 12);
+      el.style.top = top + 'px';
+      // ...and short enough to end on screen; the window scrolls inside.
+      el.style.maxHeight = (window.innerHeight - top - 12) + 'px';
       return;
     }
 
@@ -45,7 +56,7 @@ window.Desktop = (function () {
     const maxLeft = Math.max(24, window.innerWidth - width - 96);
     el.style.width = width + 'px';
     el.style.left = Math.min(maxLeft, Math.round(window.innerWidth * 0.22) + step) + 'px';
-    el.style.top = (56 + step) + 'px';
+    el.style.top = (headerTop() + 20 + step) + 'px';
   }
 
   // A window keeps whatever geometry the user gave it, but must not come back
@@ -58,7 +69,7 @@ window.Desktop = (function () {
       window.innerWidth - grabbable
     );
     const top = Math.min(
-      Math.max(parseFloat(el.style.top) || rect.top, 0),
+      Math.max(parseFloat(el.style.top) || rect.top, headerTop()),
       window.innerHeight - grabbable
     );
     el.style.left = left + 'px';
