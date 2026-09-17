@@ -12,31 +12,28 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>matthew.quest — tools</title>
+<title>matthew.quest/tools</title>
 <meta name="description" content="Unit and currency converter on matthew.quest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=7">
+<link rel="stylesheet" href="../style.css?v=8">
 </head>
 <body>
 
   <div class="grid-overlay" aria-hidden="true"></div>
-  <div class="mouse-glow" aria-hidden="true"></div>
 
   <div class="page">
   <main class="console">
     <header class="console__bar" title="Drag to move">
-      <span class="dot dot--red"></span>
-      <span class="dot dot--amber"></span>
-      <span class="dot dot--green"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
       <span class="console__title">convert.sh</span>
     </header>
 
     <div class="console__body">
-      <p class="console__line console__line--muted">$ convert --category length</p>
-
       <div class="converter">
         <div class="converter__tabs" role="tablist" aria-label="Converter category">
           <button class="converter__tab is-active" data-category="length" type="button">length</button>
@@ -51,7 +48,11 @@
             <select class="converter__select" id="fromUnit" aria-label="Convert from"></select>
           </div>
 
-          <button class="converter__swap" id="swapUnits" type="button" aria-label="Swap units">⇄</button>
+          <button class="converter__swap" id="swapUnits" type="button" aria-label="Swap units">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 7.5h11M12 4.5l3 3M16 12.5H5M8 15.5l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
 
           <div class="converter__field">
             <input class="converter__input" id="toValue" type="text" readonly aria-label="Converted result" />
@@ -69,7 +70,7 @@
     </div>
 
     <footer class="console__footer">
-      length, weight, and temperature convert instantly. currency pulls live rates when it can reach the network.
+      currency rates load over the network. everything else is done offline, in the page.
     </footer>
   </main>
   </div>
@@ -92,7 +93,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../common.js?v=7"></script>
+  <script src="../common.js?v=8"></script>
   <script src="../script.js?v=6"></script>
 </body>
 </html>

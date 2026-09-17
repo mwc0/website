@@ -1,40 +1,4 @@
 (function () {
-  const root = document.documentElement;
-  let targetX = 50, targetY = 40;
-  let currentX = 50, currentY = 40;
-  let rafId = null;
-
-  function setFromEvent(clientX, clientY) {
-    targetX = (clientX / window.innerWidth) * 100;
-    targetY = (clientY / window.innerHeight) * 100;
-    if (!rafId) rafId = requestAnimationFrame(tick);
-  }
-
-  function tick() {
-    // ease toward the target so the grid drifts rather than snapping
-    currentX += (targetX - currentX) * 0.08;
-    currentY += (targetY - currentY) * 0.08;
-    root.style.setProperty('--grid-x', currentX.toFixed(2) + '%');
-    root.style.setProperty('--grid-y', currentY.toFixed(2) + '%');
-
-    if (Math.abs(targetX - currentX) > 0.05 || Math.abs(targetY - currentY) > 0.05) {
-      rafId = requestAnimationFrame(tick);
-    } else {
-      rafId = null;
-    }
-  }
-
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (!prefersReducedMotion) {
-    window.addEventListener('mousemove', (e) => setFromEvent(e.clientX, e.clientY));
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches && e.touches[0]) {
-        setFromEvent(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
-  }
-
   // ---- Draggable + resizable windows ----
   let topZ = 10;
   const MIN_W = 300;
@@ -187,24 +151,6 @@
         taskbarHandle.setAttribute('aria-expanded', 'false');
       }
     });
-  }
-
-  // ---- Scroll/load reveal: fade + rise elements into place once ----
-  const revealEls = document.querySelectorAll('.reveal');
-  if (revealEls.length) {
-    if (prefersReducedMotion || !window.IntersectionObserver) {
-      revealEls.forEach((el) => el.classList.add('is-visible'));
-    } else {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.15 });
-      revealEls.forEach((el) => io.observe(el));
-    }
   }
 
   // ---- Live visitor presence (Supabase Realtime) ----

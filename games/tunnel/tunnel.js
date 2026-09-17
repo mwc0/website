@@ -74,8 +74,8 @@
   const palette = {};
 
   function readPalette() {
-    palette.accent = cssVar('--accent', '#3cff8e');
-    palette.accentRgb = hexToRgb(palette.accent, [60, 255, 142]);
+    palette.accent = cssVar('--accent', '#4bcf8a');
+    palette.accentRgb = hexToRgb(palette.accent, [75, 207, 138]);
     palette.danger = cssVar('--danger', '#ff6b5e');
     palette.dangerRgb = hexToRgb(palette.danger, [255, 107, 94]);
     palette.void = cssVar('--bg', '#0a0b0a');

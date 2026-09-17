@@ -8,9 +8,9 @@
   --text: #eef2ef;
   --text-dim: #8b968f;
   --text-faint: #5a635e;
-  --accent: #3cff8e;
-  --accent-soft: rgba(60, 255, 142, 0.12);
-  --accent-soft-strong: rgba(60, 255, 142, 0.22);
+  --accent: #4bcf8a;
+  --accent-soft: rgba(75, 207, 138, 0.11);
+  --accent-soft-strong: rgba(75, 207, 138, 0.20);
   --accent-ink: #06110a;
   --warn: #e2c14c;
   --danger: #ff6b5e;
@@ -22,12 +22,9 @@
   --radius-lg: 14px;
   --radius-md: 8px;
 
-  --font-display: 'Space Grotesk', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
-  --grid-x: 50%;
-  --grid-y: 40%;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 * {
@@ -52,7 +49,7 @@ a {
   color: inherit;
 }
 
-/* ---- Ambient background: grid + cursor-follow glow, shared by every page ---- */
+/* ---- Ambient background: a plain graph-paper grid, shared by every page ---- */
 
 .grid-overlay {
   position: fixed;
@@ -63,26 +60,19 @@ a {
     linear-gradient(var(--border) 1px, transparent 1px),
     linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 44px 44px;
-  background-position: var(--grid-x) var(--grid-y);
-  opacity: 0.5;
-  mask-image: radial-gradient(480px circle at var(--grid-x) var(--grid-y), black 0%, rgba(0, 0, 0, 0.45) 55%, transparent 100%);
-  -webkit-mask-image: radial-gradient(480px circle at var(--grid-x) var(--grid-y), black 0%, rgba(0, 0, 0, 0.45) 55%, transparent 100%);
-  transition: background-position 0.6s var(--ease);
+  opacity: 0.26;
 }
 
-.mouse-glow {
+/* Fine film grain over the whole page. Breaks up the flat panel fills so the
+   dark background reads as a surface rather than as #0a0b0a. */
+body::after {
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 0;
-  background: radial-gradient(
-    360px circle at var(--grid-x) var(--grid-y),
-    rgba(60, 255, 142, 0.10) 0%,
-    rgba(60, 255, 142, 0.05) 35%,
-    transparent 72%
-  );
-  transition: background-position 0.6s var(--ease);
-  filter: blur(4px);
+  z-index: 9999;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ---- Shared "console window" chrome (games, tools, hero terminal) ---- */
@@ -194,16 +184,15 @@ a {
 .resize-handle--se { bottom: 0; right: 0; cursor: nwse-resize; }
 .resize-handle--sw { bottom: 0; left: 0; cursor: nesw-resize; }
 
+/* Decorative dots stay neutral. Only a dot that actually does something gets a
+   colour, so the colour means "this is a control" instead of "this is a mac". */
 .dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   display: inline-block;
-  opacity: 0.85;
+  background: rgba(255, 255, 255, 0.14);
 }
-.dot--red { background: var(--danger); }
-.dot--amber { background: var(--warn); }
-.dot--green { background: var(--accent); }
 
 .console__title {
   margin-left: 8px;
@@ -217,14 +206,6 @@ a {
 }
 .console__body:last-child {
   padding-bottom: 28px;
-}
-
-.console__line {
-  margin: 0 0 18px;
-  font-size: 13px;
-}
-.console__line--muted {
-  color: var(--text-dim);
 }
 
 .console__footer {
@@ -362,19 +343,6 @@ body.is-interacting {
   border: 0;
 }
 
-/* ---- Scroll / load reveal utility ---- */
-
-.reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
-  transition-delay: var(--reveal-delay, 0s);
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
 /* ============================================================ */
 /* Home page                                                      */
 /* ============================================================ */
@@ -403,26 +371,18 @@ body.is-interacting {
 }
 
 .hero__title {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-weight: 700;
-  font-size: clamp(32px, 5vw, 54px);
-  line-height: 1.12;
-  letter-spacing: -0.01em;
-  margin: 0 0 20px;
+  font-size: clamp(30px, 4.6vw, 50px);
+  line-height: 1.1;
+  letter-spacing: -0.045em; /* mono runs wide at display size, so pull it in */
+  margin: 0 0 28px;
   max-width: 14ch;
 }
 
 .hero__title em {
   font-style: normal;
   color: var(--accent);
-}
-
-.hero__subtitle {
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text-dim);
-  max-width: 46ch;
-  margin: 0 0 32px;
 }
 
 .hero__ctas {
@@ -443,7 +403,7 @@ body.is-interacting {
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: transform 0.12s ease, filter 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
@@ -457,8 +417,7 @@ body.is-interacting {
 }
 
 .btn--primary:hover {
-  box-shadow: 0 10px 28px -10px var(--accent-soft-strong);
-  transform: translateY(-1px);
+  filter: brightness(1.1);
 }
 
 .btn--secondary {
@@ -498,15 +457,6 @@ body.is-interacting {
   word-break: break-word;
 }
 
-.hero-terminal__lines .is-cmd {
-  color: var(--text);
-}
-
-.hero-terminal__lines .is-cmd::before {
-  content: "$ ";
-  color: var(--accent);
-}
-
 .hero-terminal__cursor {
   display: inline-block;
   width: 7px;
@@ -536,20 +486,13 @@ body.is-interacting {
   color: var(--text);
 }
 
+/* No pulsing halo: the number changing is the proof that it is live. */
 .hero-terminal__live-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 0 var(--accent-soft-strong);
-  animation: live-pulse 2.2s ease-out infinite;
   flex-shrink: 0;
-}
-
-@keyframes live-pulse {
-  0% { box-shadow: 0 0 0 0 var(--accent-soft-strong); }
-  70% { box-shadow: 0 0 0 7px rgba(60, 255, 142, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(60, 255, 142, 0); }
 }
 
 /* ---- Showcase: asymmetric games / tools panels ---- */
@@ -568,16 +511,10 @@ body.is-interacting {
   padding: 32px;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.showcase__panel:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
 }
 
 .showcase__panel-title {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 22px;
   font-weight: 700;
   margin: 0 0 8px;
@@ -638,7 +575,7 @@ body.is-interacting {
 }
 
 .showcase__game-name {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
   transition: color 0.15s ease;
@@ -657,19 +594,11 @@ body.is-interacting {
   font-size: 12.5px;
   color: var(--text-dim);
   text-decoration: none;
-  transition: color 0.15s ease, gap 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .showcase__link:hover {
   color: var(--accent);
-  gap: 10px;
-}
-
-.showcase__link .btn__arrow {
-  transition: transform 0.15s ease;
-}
-.showcase__link:hover .btn__arrow {
-  transform: translateX(2px);
 }
 
 /* Mini per-game CSS icons */
@@ -750,7 +679,21 @@ body.is-interacting {
 }
 
 .site-footer__brand {
+  color: var(--text-faint);
+}
+
+.site-footer__links {
+  display: flex;
+  gap: 18px;
+}
+
+.site-footer__links a {
   color: var(--text-dim);
+  text-decoration: none;
+}
+
+.site-footer__links a:hover {
+  color: var(--accent);
 }
 
 @media (max-width: 860px) {
@@ -777,77 +720,6 @@ body.is-interacting {
   .showcase__panel {
     padding: 24px;
   }
-}
-
-/* ============================================================ */
-/* Games hub                                                      */
-/* ============================================================ */
-
-.games-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 22px;
-}
-
-.games-list__item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-}
-
-.games-list__item:hover {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  transform: translateX(2px);
-}
-
-.games-list__icon {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
-  background: var(--bg-well);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.games-list__copy {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  flex: 1;
-  min-width: 0;
-}
-
-.games-list__name {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.games-list__desc {
-  font-size: 12px;
-  color: var(--text-dim);
-}
-
-.games-list__item .btn__arrow {
-  flex-shrink: 0;
-  color: var(--text-faint);
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-.games-list__item:hover .btn__arrow {
-  color: var(--accent);
-  transform: translateX(2px);
 }
 
 /* ---- Shared game HUD / overlay / hint (snake, wordle, tunnel) ---- */
@@ -899,7 +771,7 @@ body.is-interacting {
 }
 
 .game-overlay__title {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: clamp(22px, 5vw, 28px);
   margin: 0;
   color: var(--accent);
@@ -1034,12 +906,14 @@ body.is-interacting {
   opacity: 0.94;
 }
 
-/* Only the red dot does anything, so it is the only one that reacts. */
+/* The close dot is the only one that does anything, so it is the only one that
+   carries colour and reacts to the pointer. */
 .window__close {
   padding: 0;
   border: none;
   cursor: pointer;
   position: relative;
+  background: var(--danger);
   transition: filter 0.15s ease;
 }
 
@@ -1095,7 +969,7 @@ body.is-interacting {
 }
 
 .leaderboard__title {
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 500;
   margin: 0;
@@ -1295,7 +1169,7 @@ body.is-interacting {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-display);
+  font-family: var(--font-mono);
   font-size: clamp(18px, 4.5vw, 24px);
   font-weight: 700;
   color: var(--text);
@@ -1579,15 +1453,21 @@ body.is-interacting {
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-dim);
-  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.converter__swap svg {
+  width: 17px;
+  height: 17px;
 }
 
 .converter__swap:hover {
   color: var(--accent);
   border-color: var(--accent);
-  transform: rotate(180deg);
 }
 
 .converter__note {
@@ -1604,10 +1484,7 @@ body.is-interacting {
   .converter__swap {
     align-self: center;
     margin-top: 0;
-    transform: rotate(90deg);
-  }
-  .converter__swap:hover {
-    transform: rotate(270deg);
+    transform: rotate(90deg); /* stacked layout, so the arrows point up and down */
   }
   .console__body {
     padding: 22px 18px 6px;
@@ -1618,11 +1495,6 @@ body.is-interacting {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
   .hero-terminal__cursor,
   .game-stat strong.is-bump,
   .icon-snake span,
@@ -1633,9 +1505,7 @@ body.is-interacting {
   .taskbar,
   .taskbar__arrow,
   .taskbar__panel,
-  .showcase__panel,
-  .btn,
-  .games-list__item {
+  .btn {
     transition: none !important;
     animation: none !important;
   }

@@ -12,18 +12,17 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>matthew.quest — games</title>
+<title>matthew.quest/games</title>
 <meta name="description" content="Snake, Wordle and Driftwalk, playable in draggable windows on matthew.quest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=7">
+<link rel="stylesheet" href="../style.css?v=8">
 </head>
 <body class="body--desktop">
 
   <div class="grid-overlay" aria-hidden="true"></div>
-  <div class="mouse-glow" aria-hidden="true"></div>
 
   <main class="desktop" data-desktop>
     <h1 class="visually-hidden">games</h1>
@@ -58,9 +57,9 @@
     <!-- ---- snake ---- -->
     <section class="console window" data-window="snake" data-width="470" aria-label="Snake" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot dot--red window__close" type="button" data-close="snake" aria-label="Close snake"></button>
-        <span class="dot dot--amber" aria-hidden="true"></span>
-        <span class="dot dot--green" aria-hidden="true"></span>
+        <button class="dot window__close" type="button" data-close="snake" aria-label="Close snake"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
         <span class="console__title">snake.sh</span>
       </header>
 
@@ -108,9 +107,9 @@
     <!-- ---- wordle ---- -->
     <section class="console window" data-window="wordle" data-width="430" aria-label="Wordle" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot dot--red window__close" type="button" data-close="wordle" aria-label="Close wordle"></button>
-        <span class="dot dot--amber" aria-hidden="true"></span>
-        <span class="dot dot--green" aria-hidden="true"></span>
+        <button class="dot window__close" type="button" data-close="wordle" aria-label="Close wordle"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
         <span class="console__title">wordle.sh</span>
       </header>
 
@@ -141,9 +140,9 @@
     <!-- ---- driftwalk ---- -->
     <section class="console window" data-window="tunnel" data-width="560" aria-label="Driftwalk" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot dot--red window__close" type="button" data-close="tunnel" aria-label="Close driftwalk"></button>
-        <span class="dot dot--amber" aria-hidden="true"></span>
-        <span class="dot dot--green" aria-hidden="true"></span>
+        <button class="dot window__close" type="button" data-close="tunnel" aria-label="Close driftwalk"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
         <span class="console__title">driftwalk.sh</span>
       </header>
 
@@ -158,7 +157,7 @@
             <canvas id="tunnelCanvas" width="480" height="340" aria-label="Driftwalk game board"></canvas>
             <div class="game-overlay" id="tunnelOverlay">
               <p class="game-overlay__title" id="tunnelOverlayTitle">driftwalk</p>
-              <p class="game-overlay__sub" id="tunnelOverlaySub">run the tunnel. steer around the walls, jump the holes.</p>
+              <p class="game-overlay__sub" id="tunnelOverlaySub">steer around the walls and jump the gaps</p>
             </div>
           </div>
 
@@ -192,7 +191,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../common.js?v=7"></script>
+  <script src="../common.js?v=8"></script>
   <script src="leaderboard.js?v=1"></script>
   <script src="snake/snake.js?v=3"></script>
   <script src="wordle/wordle.js?v=2"></script>

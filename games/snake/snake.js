@@ -71,8 +71,8 @@
 
   function readPalette() {
     palette.board = cssVar('--bg-well', '#0d0f0d');
-    palette.accent = cssVar('--accent', '#3cff8e');
-    palette.accentRgb = hexToRgb(palette.accent, [60, 255, 142]);
+    palette.accent = cssVar('--accent', '#4bcf8a');
+    palette.accentRgb = hexToRgb(palette.accent, [75, 207, 138]);
     palette.food = cssVar('--warn', '#e2c14c');
     palette.foodRgb = hexToRgb(palette.food, [226, 193, 76]);
     palette.danger = cssVar('--danger', '#ff6b5e');
