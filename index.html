@@ -28,11 +28,9 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=20">
 </head>
 <body>
-
-  <div class="grid-overlay" aria-hidden="true"></div>
 
   <header class="site-header">
     <a class="site-header__brand" href="./">matthew<em>.</em>quest</a>
@@ -80,7 +78,6 @@
     <section class="showcase">
       <article class="showcase__panel" id="showcaseGames">
         <h2 class="showcase__panel-title">games</h2>
-        <p class="showcase__panel-desc">Three of them. They open in windows you can drag around and stack.</p>
         <div class="showcase__game-list">
           <a class="showcase__game" href="games/?open=snake">
             <span class="showcase__game-icon"><span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
@@ -112,8 +109,26 @@
 
       <article class="showcase__panel" id="showcaseTools">
         <h2 class="showcase__panel-title">tools</h2>
-        <p class="showcase__panel-desc">Length, weight and temperature, plus currency at whatever today's rate is.</p>
-        <a class="showcase__link showcase__link--flush" href="tools/">
+        <p class="showcase__panel-desc">converter</p>
+        <dl class="unit-table">
+          <div class="unit-table__row">
+            <dt>length</dt>
+            <dd>mm cm m km in ft yd mi</dd>
+          </div>
+          <div class="unit-table__row">
+            <dt>weight</dt>
+            <dd>mg g kg t oz lb</dd>
+          </div>
+          <div class="unit-table__row">
+            <dt>temp</dt>
+            <dd>C F K</dd>
+          </div>
+          <div class="unit-table__row">
+            <dt>currency</dt>
+            <dd>USD EUR GBP JPY CAD AUD</dd>
+          </div>
+        </dl>
+        <a class="showcase__link" href="tools/">
           open converter
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>

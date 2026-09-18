@@ -118,9 +118,12 @@ a {
   outline-offset: 2px;
 }
 
-/* ---- Ambient background: a plain graph-paper grid, shared by every page ---- */
+/* ---- Ambient background: a plain graph-paper grid ----
+   Used only on the games page, where windows are literally dropped onto a
+   desktop grid. Deliberately left off the homepage and tools, which aren't
+   a grid surface and don't earn the pattern; film grain alone carries those. */
 
-.grid-overlay {
+.grid-overlay { /* impeccable-disable-line codex-grid-background -- confined to the games desktop; see comment above */
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -166,7 +169,6 @@ body::after {
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-panel);
   overflow: hidden;
   position: relative;
 }
@@ -303,7 +305,7 @@ body::after {
   color: var(--text);
   text-decoration: none;
   white-space: nowrap;
-  border-radius: 4px;
+  border-radius: 4px; /* impeccable-disable-line design-system-radius -- focus-ring rounding sized to this link only, not a shared control */
 }
 
 .site-header__brand em {
@@ -381,11 +383,12 @@ body.is-interacting {
   padding: 0 24px;
 }
 
+/* Height comes from the content, not the viewport. Forcing the hero to fill the
+   screen left a large void under the terminal, because neither column is tall. */
 .hero {
-  min-height: 86dvh;
   display: flex;
   align-items: center;
-  padding: 96px 0 56px;
+  padding: calc(var(--header-h) + 52px) 0 60px;
 }
 
 .hero__inner {
@@ -465,14 +468,16 @@ body.is-interacting {
   margin-left: auto;
 }
 
+/* Just enough to clear the clock, the live line and the cursor. Anything more
+   and the window reads as half-empty. */
 .hero__terminal .console__body {
   padding: 22px 24px;
-  min-height: 200px;
+  min-height: 132px;
 }
 
 .hero-terminal__lines {
   margin: 0;
-  font-size: 12.5px;
+  font-size: 12.5px; /* impeccable-disable-line design-system-font-size -- tuned with the 1.75 line-height for this terminal's own rhythm */
   line-height: 1.75;
   color: var(--text-dim);
   white-space: pre-wrap;
@@ -532,10 +537,13 @@ body.is-interacting {
 
 /* ---- Showcase: asymmetric games / tools panels ---- */
 
+/* Each panel ends where its content ends. Stretching them to a shared height
+   left the shorter one with a hole above its link. */
 .showcase {
   padding: 40px 0 88px;
   display: grid;
   grid-template-columns: 1.4fr 1fr;
+  align-items: start;
   gap: 20px;
 }
 
@@ -568,6 +576,11 @@ body.is-interacting {
   flex-direction: column;
   gap: 4px;
   margin-bottom: 20px;
+}
+
+/* No description above it, so the list supplies its own space under the title. */
+.showcase__panel-title + .showcase__game-list {
+  margin-top: 18px;
 }
 
 .showcase__game {
@@ -626,7 +639,7 @@ body.is-interacting {
   align-items: center;
   gap: 6px;
   margin-top: auto;
-  font-size: 12.5px;
+  font-size: 12.5px; /* impeccable-disable-line design-system-font-size -- half-step between Body and Micro for this link only */
   color: var(--text-dim);
   text-decoration: none;
   transition: color 0.15s ease, scale 0.2s var(--ease);
@@ -635,6 +648,33 @@ body.is-interacting {
 /* A panel with no list: the link follows the description directly */
 .showcase__link--flush {
   margin-top: 0;
+}
+
+/* What the converter actually handles, so the panel carries information
+   rather than sitting half empty next to the taller games list. */
+.unit-table {
+  margin: 0 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unit-table__row {
+  display: grid;
+  grid-template-columns: 8ch 1fr;
+  gap: 14px;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.unit-table dt {
+  color: var(--text);
+}
+
+.unit-table dd {
+  margin: 0;
+  color: var(--text-dim);
+  word-spacing: 0.35em;
 }
 
 .showcase__link:hover {
@@ -650,7 +690,7 @@ body.is-interacting {
 }
 .icon-snake span {
   background: var(--text-faint);
-  border-radius: 1px;
+  border-radius: 1px; /* impeccable-disable-line design-system-radius -- pixel-scale icon glyph, not a shared control */
   animation: icon-snake-pulse 1.8s ease-in-out infinite;
 }
 .icon-snake span:nth-child(1) { grid-area: 1 / 1; animation-delay: 0s; }
@@ -671,7 +711,7 @@ body.is-interacting {
   width: 10px;
   height: 10px;
   border: 1px solid var(--border-strong);
-  border-radius: 2px;
+  border-radius: 2px; /* impeccable-disable-line design-system-radius -- pixel-scale icon glyph, not a shared control */
   animation: icon-wordle-flip 2.4s ease-in-out infinite;
 }
 .icon-wordle span:nth-child(1) { animation-delay: 0s; }
@@ -692,7 +732,7 @@ body.is-interacting {
   inset: 0;
   margin: auto;
   border: 1px solid var(--text-faint);
-  border-radius: 3px;
+  border-radius: 3px; /* impeccable-disable-line design-system-radius -- pixel-scale icon glyph, not a shared control */
   animation: icon-tunnel-zoom 1.8s linear infinite;
 }
 .icon-tunnel span:nth-child(1) { animation-delay: 0s; }
@@ -815,7 +855,7 @@ body.is-interacting {
 
 .game-overlay__title {
   font-family: var(--font-mono);
-  font-size: clamp(24px, 5vw, 28px);
+  font-size: clamp(24px, 5vw, 28px); /* impeccable-disable-line design-system-font-size -- fluid scale tied to this overlay's own container, not the page type ramp */
   margin: 0;
   color: var(--accent);
   text-transform: lowercase;
@@ -887,6 +927,19 @@ body.is-interacting {
   width: 96px;
 }
 
+/* The desktop starts empty, so say what the icons are for. Once a window is
+   open the hint has done its job and fades out. */
+.desktop__hint {
+  margin: 16px 0 0;
+  font-size: 11.5px;
+  color: var(--text-faint);
+  transition: opacity 0.35s var(--ease);
+}
+
+.desktop:has(.window:not([hidden])) .desktop__hint {
+  opacity: 0;
+}
+
 .desktop-icon {
   width: 100%;
   display: flex;
@@ -916,7 +969,7 @@ body.is-interacting {
 .desktop-icon__glyph {
   width: 46px;
   height: 46px;
-  border-radius: 10px;
+  border-radius: 10px; /* impeccable-disable-line design-system-radius -- scaled to this 46px tile, between md and lg */
   border: 1px solid var(--border);
   background: var(--bg-well);
   display: flex;
@@ -975,29 +1028,50 @@ body.is-interacting {
 }
 
 /* The close dot is the only one that does anything, so it is the only one that
-   carries colour and reacts to the pointer. */
+   carries colour and reacts to the pointer. The visible dot stays 10px; the
+   button itself is a real 24px target, pulled back in with a negative margin
+   so it doesn't disturb the bar's layout or push the other dots and title over. */
 .window__close {
+  width: 24px;
+  height: 24px;
+  margin: -7px;
   padding: 0;
   border: none;
+  border-radius: 50%;
   cursor: pointer;
   position: relative;
-  background: var(--danger);
-  transition: filter 0.15s ease, scale 0.2s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  transition: scale 0.2s var(--ease);
 }
 
-.window__close:hover {
+.window__close::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  transition: filter 0.15s ease;
+}
+
+.window__close:hover::before {
   filter: brightness(1.25);
 }
 
 .window__close::after {
   content: "";
   position: absolute;
-  inset: 2px;
+  width: 6px;
+  height: 6px;
+  top: 50%;
+  left: 50%;
   opacity: 0;
   background:
     linear-gradient(to bottom, transparent 44%, var(--bg) 44%, var(--bg) 56%, transparent 56%),
     linear-gradient(to right, transparent 44%, var(--bg) 44%, var(--bg) 56%, transparent 56%);
-  transform: rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
   transition: opacity 0.15s ease;
 }
 
@@ -1121,7 +1195,7 @@ body.is-interacting {
 .score-entry__input {
   width: 128px;
   font-family: var(--font-mono);
-  font-size: 26px;
+  font-size: 26px; /* impeccable-disable-line design-system-font-size -- one-off, large arcade-initials entry, not part of the reading scale */
   font-weight: 600;
   text-align: center;
   text-transform: uppercase;
@@ -1238,7 +1312,7 @@ body.is-interacting {
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: clamp(18px, 4.5vw, 24px);
+  font-size: clamp(18px, 4.5vw, 24px); /* impeccable-disable-line design-system-font-size -- fluid scale tied to this tile's own aspect-ratio box, not the page type ramp */
   font-weight: 700;
   color: var(--text);
   background: var(--bg-well);
@@ -1301,7 +1375,7 @@ body.is-interacting {
   color: var(--text);
   background: var(--bg-well);
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 5px; /* impeccable-disable-line design-system-radius -- scaled to this keyboard key, not a shared control */
   padding: 12px 0;
   flex: 1;
   min-width: 0;
@@ -1316,7 +1390,7 @@ body.is-interacting {
 
 .wordle__key--wide {
   max-width: 56px;
-  font-size: 10px;
+  font-size: 10px; /* impeccable-disable-line design-system-font-size -- compact label for "enter"/"del" on the wide key only */
   text-transform: lowercase;
 }
 
@@ -1448,7 +1522,7 @@ body.is-interacting {
 }
 
 .converter__format-btn {
-  font-size: 10px;
+  font-size: 10px; /* impeccable-disable-line design-system-font-size -- compact secondary toggle label, not part of the reading scale */
   padding: 5px 10px;
   opacity: 0.85;
 }
@@ -1473,7 +1547,7 @@ body.is-interacting {
 
 .converter__input {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 16px; /* impeccable-disable-line design-system-font-size -- floor kept at 16px to stop iOS Safari zooming on focus */
   color: var(--text);
   background: var(--bg-well);
   border: 1px solid var(--border);
@@ -1724,7 +1798,7 @@ body.is-interacting {
   .tunnel__stage {
     --border: rgba(255, 255, 255, 0.28);
     --border-strong: rgba(255, 255, 255, 0.5);
-    --text-dim: #b7c2bb;
+    --text-dim: #b7c2bb; /* impeccable-disable-line design-system-color -- prefers-contrast: more override, not the default token */
     --text-faint: #8b968f;
   }
 }
