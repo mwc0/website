@@ -40,6 +40,7 @@
 
   --radius-lg: 14px;
   --radius-md: 8px;
+  --radius-sm: 6px;
 
   --font-mono: 'IBM Plex Mono', monospace;
 
@@ -119,9 +120,9 @@ a {
 }
 
 /* ---- Ambient background: a plain graph-paper grid ----
-   Used only on the games page, where windows are literally dropped onto a
-   desktop grid. Deliberately left off the homepage and tools, which aren't
-   a grid surface and don't earn the pattern; film grain alone carries those. */
+   Marks a desktop: the games and tools pages, where windows are literally
+   dropped onto a grid. Deliberately left off the homepage, which isn't a
+   grid surface and doesn't earn the pattern; film grain carries that alone. */
 
 .grid-overlay { /* impeccable-disable-line codex-grid-background -- confined to the games desktop; see comment above */
   position: fixed;
@@ -148,21 +149,6 @@ body::after {
 }
 
 /* ---- Shared "console window" chrome (games, tools, hero terminal) ---- */
-
-.page {
-  width: 100%;
-  max-width: 620px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  position: relative;
-  z-index: 1;
-  padding: calc(var(--header-h) + 24px) 16px 32px;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-}
 
 .console {
   width: 100%;
@@ -216,7 +202,7 @@ body::after {
 }
 .console.is-floating::-webkit-scrollbar-thumb {
   background: var(--border-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   border: 2px solid var(--bg-panel);
 }
 .console.is-floating::-webkit-scrollbar-thumb:hover {
@@ -645,38 +631,6 @@ body.is-interacting {
   transition: color 0.15s ease, scale 0.2s var(--ease);
 }
 
-/* A panel with no list: the link follows the description directly */
-.showcase__link--flush {
-  margin-top: 0;
-}
-
-/* What the converter actually handles, so the panel carries information
-   rather than sitting half empty next to the taller games list. */
-.unit-table {
-  margin: 0 0 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.unit-table__row {
-  display: grid;
-  grid-template-columns: 8ch 1fr;
-  gap: 14px;
-  align-items: baseline;
-  font-size: 12px;
-}
-
-.unit-table dt {
-  color: var(--text);
-}
-
-.unit-table dd {
-  margin: 0;
-  color: var(--text-dim);
-  word-spacing: 0.35em;
-}
-
 .showcase__link:hover {
   color: var(--accent);
 }
@@ -742,6 +696,106 @@ body.is-interacting {
   0% { width: 2px; height: 2px; opacity: 0; border-color: var(--accent); }
   15% { opacity: 1; }
   100% { width: 18px; height: 18px; opacity: 0; border-color: var(--text-faint); }
+}
+
+/* Mini per-tool CSS icons, drawn the same way as the game ones above: a few
+   spans each, monochrome at rest, touching the accent as they cycle. */
+.icon-convert {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.icon-convert span {
+  height: 3px;
+  border-radius: 1px; /* impeccable-disable-line design-system-radius -- pixel-scale icon glyph, not a shared control */
+  background: var(--text-faint);
+  animation: icon-convert-trade 2.6s ease-in-out infinite;
+}
+.icon-convert span:nth-child(1) { width: 18px; }
+.icon-convert span:nth-child(2) { width: 10px; animation-delay: 1.3s; }
+@keyframes icon-convert-trade {
+  0%, 40%, 100% { width: 18px; background: var(--text-faint); }
+  55%, 85% { width: 10px; background: var(--accent); }
+}
+
+.icon-epoch {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--text-faint);
+  border-radius: 50%;
+}
+/* The hand steps rather than sweeps, so it reads as a clock ticking. */
+.icon-epoch span:nth-child(1) {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 1px;
+  height: 6px;
+  background: var(--text-faint);
+  transform-origin: bottom center;
+  animation: icon-epoch-tick 8s steps(8) infinite;
+}
+.icon-epoch span:nth-child(2) {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  animation: icon-epoch-pulse 8s ease-in-out infinite;
+}
+@keyframes icon-epoch-tick {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(360deg); }
+}
+@keyframes icon-epoch-pulse {
+  0%, 100% { background: var(--text-faint); }
+  50% { background: var(--accent); }
+}
+
+.icon-base {
+  display: flex;
+  gap: 3px;
+}
+/* Four bits counting up, which is the thing the window actually does. */
+.icon-base span {
+  width: 3px;
+  height: 14px;
+  border-radius: 1px; /* impeccable-disable-line design-system-radius -- pixel-scale icon glyph, not a shared control */
+  background: var(--text-faint);
+  animation: icon-base-bit 2.4s steps(1) infinite;
+}
+.icon-base span:nth-child(1) { animation-delay: 0s; }
+.icon-base span:nth-child(2) { animation-delay: 0.3s; }
+.icon-base span:nth-child(3) { animation-delay: 0.6s; }
+.icon-base span:nth-child(4) { animation-delay: 0.9s; }
+@keyframes icon-base-bit {
+  0%, 50% { transform: scaleY(1); background: var(--text-faint); }
+  50.01%, 100% { transform: scaleY(0.45); background: var(--accent); }
+}
+
+.icon-colour {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--text-faint);
+  border-radius: 50%;
+  overflow: hidden;
+}
+/* Half the disc filled: the standard contrast mark, and the one thing this
+   window is really for. */
+.icon-colour span {
+  position: absolute;
+  inset: 0;
+  background: var(--text-faint);
+  clip-path: inset(0 0 0 50%);
+  animation: icon-colour-sweep 3.2s ease-in-out infinite;
+}
+@keyframes icon-colour-sweep {
+  0%, 100% { background: var(--text-faint); transform: rotate(0deg); }
+  50% { background: var(--accent); transform: rotate(180deg); }
 }
 
 /* ---- Footer ---- */
@@ -903,7 +957,7 @@ body.is-interacting {
 }
 
 /* ============================================================ */
-/* Games desktop                                                  */
+/* Desktop: shared by the games and tools pages                   */
 /* ============================================================ */
 
 .body--desktop {
@@ -1138,7 +1192,7 @@ body.is-interacting {
   align-items: center;
   gap: 14px;
   padding: 7px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
 }
 
@@ -1491,7 +1545,8 @@ body.is-interacting {
 }
 
 .converter__tab,
-.converter__format-btn {
+.converter__format-btn,
+.tool__pill {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.04em;
@@ -1505,13 +1560,15 @@ body.is-interacting {
 }
 
 .converter__tab:hover,
-.converter__format-btn:hover {
+.converter__format-btn:hover,
+.tool__pill:hover {
   color: var(--text);
   border-color: var(--border-strong);
 }
 
 .converter__tab.is-active,
-.converter__format-btn.is-active {
+.converter__format-btn.is-active,
+.tool__pill.is-active {
   color: var(--accent-ink);
   background: var(--accent);
   border-color: var(--accent);
@@ -1521,13 +1578,15 @@ body.is-interacting {
   margin-top: -4px;
 }
 
-.converter__format-btn {
+.converter__format-btn,
+.tool__pill {
   font-size: 10px; /* impeccable-disable-line design-system-font-size -- compact secondary toggle label, not part of the reading scale */
   padding: 5px 10px;
   opacity: 0.85;
 }
 
-.converter__format-btn.is-active {
+.converter__format-btn.is-active,
+.tool__pill.is-active {
   opacity: 1;
 }
 
@@ -1545,7 +1604,8 @@ body.is-interacting {
   min-width: 0;
 }
 
-.converter__input {
+.converter__input,
+.tool__input {
   font-family: var(--font-mono);
   font-size: 16px; /* impeccable-disable-line design-system-font-size -- floor kept at 16px to stop iOS Safari zooming on focus */
   color: var(--text);
@@ -1558,7 +1618,9 @@ body.is-interacting {
 }
 
 .converter__input:focus,
-.converter__input:focus-visible {
+.converter__input:focus-visible,
+.tool__input:focus,
+.tool__input:focus-visible {
   outline: none;
   border-color: var(--accent);
 }
@@ -1609,6 +1671,246 @@ body.is-interacting {
   margin: 0;
   font-size: 11px;
   color: var(--text-dim);
+}
+
+/* ============================================================ */
+/* Tools: shared parts of epoch / base / colour                   */
+/* ============================================================ */
+
+.tool {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.tool__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Two unrelated jobs in one window (base.sh converts numbers and encodes
+   text), so a hairline says where one ends. The padding matches the stack
+   gap above it, which lands the rule midway between the two. */
+.tool--divided .tool__group + .tool__group {
+  border-top: 1px solid var(--border);
+  padding-top: 18px;
+}
+
+.tool__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+
+.tool__sublabel {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* An input with something pinned beside it: the "now" button, a swatch. */
+.tool__inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool__inline .tool__input {
+  flex: 1;
+}
+
+.tool__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tool__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* A field the value can't be read out of is worth saying so about, rather
+   than silently showing the last good answer. */
+.tool__input.is-invalid {
+  border-color: var(--danger);
+}
+
+.tool__note {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+/* Only shown while the window is following the clock, so the accent means
+   the same thing here as the presence dot on the home page: this is live. */
+.tool__live {
+  color: var(--accent);
+  font-size: 11px;
+}
+
+.tool__live::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+}
+
+/* ---- readout rows ---- */
+
+.tool__rows {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tool__row {
+  display: grid;
+  grid-template-columns: 8ch 1fr;
+  gap: 14px;
+  align-items: baseline;
+}
+
+.tool__row dt {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.tool__row dd {
+  margin: 0;
+  min-width: 0;
+}
+
+/* The value is the control: clicking it copies. */
+.tool__value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  margin-left: -6px;
+  max-width: 100%;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tool__value:hover {
+  background: var(--tint);
+}
+
+.tool__value.is-copied {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.tool__output {
+  display: block;
+  font-size: 12px;
+  color: var(--accent);
+  background: var(--bg-well);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  min-height: 42px;
+  overflow-wrap: anywhere;
+}
+
+.tool__output.is-invalid {
+  color: var(--danger);
+}
+
+/* ---- colour ---- */
+
+.tool__swatch {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+}
+
+.tool__preview {
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  text-align: center;
+}
+
+.tool__result {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.tool__ratio {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.tool__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Pass and fail are the whole point of the readout, so this is one of the
+   few places a colour carries the meaning on its own. The symbol carries it
+   too, for anyone who can't separate the two hues. */
+.tool__badge {
+  font-size: 10px; /* impeccable-disable-line design-system-font-size -- compact status chip, not part of the reading scale */
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px 8px;
+}
+
+.tool__badge::before {
+  margin-right: 5px;
+}
+
+.tool__badge.is-pass {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tool__badge.is-pass::before {
+  content: "✓";
+}
+
+.tool__badge.is-fail {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.tool__badge.is-fail::before {
+  content: "✕";
+}
+
+@media (max-width: 420px) {
+  .tool__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {
@@ -1712,17 +2014,40 @@ body.is-interacting {
 [data-open="tunnel"] .desktop-icon__glyph {
   view-transition-name: game-tunnel;
 }
+.showcase__game[href$="open=convert"] .showcase__game-icon,
+[data-open="convert"] .desktop-icon__glyph {
+  view-transition-name: tool-convert;
+}
+.showcase__game[href$="open=epoch"] .showcase__game-icon,
+[data-open="epoch"] .desktop-icon__glyph {
+  view-transition-name: tool-epoch;
+}
+.showcase__game[href$="open=base"] .showcase__game-icon,
+[data-open="base"] .desktop-icon__glyph {
+  view-transition-name: tool-base;
+}
+.showcase__game[href$="open=colour"] .showcase__game-icon,
+[data-open="colour"] .desktop-icon__glyph {
+  view-transition-name: tool-colour;
+}
 
 ::view-transition-group(game-snake),
 ::view-transition-group(game-wordle),
-::view-transition-group(game-tunnel) {
+::view-transition-group(game-tunnel),
+::view-transition-group(tool-convert),
+::view-transition-group(tool-epoch),
+::view-transition-group(tool-base),
+::view-transition-group(tool-colour) {
   animation-duration: 0.52s;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Stagger the three by a beat so they read as individual objects moving */
+/* Stagger them by a beat so they read as individual objects moving */
 ::view-transition-group(game-wordle) { animation-delay: 0.03s; }
 ::view-transition-group(game-tunnel) { animation-delay: 0.06s; }
+::view-transition-group(tool-epoch) { animation-delay: 0.03s; }
+::view-transition-group(tool-base) { animation-delay: 0.06s; }
+::view-transition-group(tool-colour) { animation-delay: 0.09s; }
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -1742,6 +2067,7 @@ body.is-interacting {
 .desktop-icon:active,
 .converter__tab:active,
 .converter__format-btn:active,
+.tool__pill:active,
 .score-entry__btn:active,
 .tunnel__btn:active {
   scale: var(--press-scale);
@@ -1769,6 +2095,10 @@ body.is-interacting {
   .icon-snake span,
   .icon-wordle span,
   .icon-tunnel span,
+  .icon-convert span,
+  .icon-epoch span,
+  .icon-base span,
+  .icon-colour span,
   .wordle__tile,
   .wordle__row--shake,
   .btn,

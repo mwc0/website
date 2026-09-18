@@ -13,7 +13,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>matthew.quest/tools</title>
-<meta name="description" content="Unit and currency converter on matthew.quest.">
+<meta name="description" content="A unit and currency converter, unix timestamps, hex and base64, and colour contrast. All of it runs in the browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -28,9 +28,18 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="../style.css?v=20">
+<link rel="stylesheet" href="../style.css?v=23">
+<script>
+  // Record how this page was revealed (with or without a cross-page view
+  // transition) before first paint, which can land before desktop.js loads.
+  addEventListener('pagereveal', function (e) {
+    window.desktopArrival = e.viewTransition || null;
+  }, { once: true });
+</script>
 </head>
-<body>
+<body class="body--desktop">
+
+  <div class="grid-overlay" aria-hidden="true"></div>
 
   <header class="site-header">
     <a class="site-header__brand" href="../">matthew<em>.</em>quest</a>
@@ -50,55 +59,211 @@
     </button>
   </header>
 
-  <div class="page">
-  <main class="console">
-    <header class="console__bar" title="Drag to move">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="console__title">convert.sh</span>
-    </header>
+  <main class="desktop" data-desktop>
+    <h1 class="visually-hidden">tools</h1>
 
-    <div class="console__body">
-      <div class="converter">
-        <div class="converter__tabs" role="tablist" aria-label="Converter category">
-          <button class="converter__tab is-active" data-category="length" type="button">length</button>
-          <button class="converter__tab" data-category="weight" type="button">weight</button>
-          <button class="converter__tab" data-category="temperature" type="button">temp</button>
-          <button class="converter__tab" data-category="currency" type="button">currency</button>
-        </div>
+    <ul class="desktop__icons">
+      <li>
+        <button class="desktop-icon" type="button" data-open="convert">
+          <span class="desktop-icon__glyph">
+            <span class="icon-convert" aria-hidden="true"><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">convert</span>
+        </button>
+      </li>
+      <li>
+        <button class="desktop-icon" type="button" data-open="epoch">
+          <span class="desktop-icon__glyph">
+            <span class="icon-epoch" aria-hidden="true"><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">epoch</span>
+        </button>
+      </li>
+      <li>
+        <button class="desktop-icon" type="button" data-open="base">
+          <span class="desktop-icon__glyph">
+            <span class="icon-base" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          </span>
+          <span class="desktop-icon__label">base</span>
+        </button>
+      </li>
+      <li>
+        <button class="desktop-icon" type="button" data-open="colour">
+          <span class="desktop-icon__glyph">
+            <span class="icon-colour" aria-hidden="true"><span></span></span>
+          </span>
+          <span class="desktop-icon__label">colour</span>
+        </button>
+      </li>
+    </ul>
 
-        <div class="converter__row">
-          <div class="converter__field">
-            <input class="converter__input" id="fromValue" type="number" inputmode="decimal" value="1" />
-            <select class="converter__select" id="fromUnit" aria-label="Convert from"></select>
+    <p class="desktop__hint">click one to open it</p>
+
+    <!-- ---- convert ---- -->
+    <section class="console window" data-window="convert" data-width="470" aria-label="Converter" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot window__close" type="button" data-close="convert" aria-label="Close converter"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="console__title">convert.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="converter">
+          <div class="converter__tabs" role="tablist" aria-label="Converter category">
+            <button class="converter__tab is-active" data-category="length" type="button">length</button>
+            <button class="converter__tab" data-category="weight" type="button">weight</button>
+            <button class="converter__tab" data-category="temperature" type="button">temp</button>
+            <button class="converter__tab" data-category="currency" type="button">currency</button>
           </div>
 
-          <button class="converter__swap" id="swapUnits" type="button" aria-label="Swap units">
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M4 7.5h11M12 4.5l3 3M16 12.5H5M8 15.5l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
+          <div class="converter__row">
+            <div class="converter__field">
+              <input class="converter__input" id="fromValue" type="number" inputmode="decimal" value="1" />
+              <select class="converter__select" id="fromUnit" aria-label="Convert from"></select>
+            </div>
 
-          <div class="converter__field">
-            <input class="converter__input" id="toValue" type="text" readonly aria-label="Converted result" />
-            <select class="converter__select" id="toUnit" aria-label="Convert to"></select>
+            <button class="converter__swap" id="swapUnits" type="button" aria-label="Swap units">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="M4 7.5h11M12 4.5l3 3M16 12.5H5M8 15.5l-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <div class="converter__field">
+              <input class="converter__input" id="toValue" type="text" readonly aria-label="Converted result" />
+              <select class="converter__select" id="toUnit" aria-label="Convert to"></select>
+            </div>
           </div>
-        </div>
 
-        <div class="converter__tabs converter__tabs--format" role="tablist" aria-label="Number format">
-          <button class="converter__format-btn is-active" data-format="decimal" type="button">decimal</button>
-          <button class="converter__format-btn" data-format="standard" type="button">standard form</button>
-        </div>
+          <div class="converter__tabs converter__tabs--format" role="tablist" aria-label="Number format">
+            <button class="converter__format-btn is-active" data-format="decimal" type="button">decimal</button>
+            <button class="converter__format-btn" data-format="standard" type="button">standard form</button>
+          </div>
 
-        <p class="converter__note" id="converterNote">1 metre = 3.28084 feet</p>
+          <p class="converter__note" id="converterNote">1 metre = 3.28084 feet</p>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- ---- epoch ---- -->
+    <section class="console window" data-window="epoch" data-width="440" aria-label="Timestamp converter" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot window__close" type="button" data-close="epoch" aria-label="Close epoch"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="console__title">epoch.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="tool">
+          <div class="tool__group">
+            <label class="tool__label" for="epochInput">epoch or date <span class="tool__live" id="epochLive">tracking now</span></label>
+            <div class="tool__inline">
+              <input class="tool__input" id="epochInput" type="text" spellcheck="false" autocomplete="off" placeholder="leave empty to follow the clock" />
+              <button class="tool__pill" type="button" id="epochNow">now</button>
+            </div>
+            <p class="tool__note" id="epochNote">reading the clock every second</p>
+          </div>
+
+          <dl class="tool__rows" id="epochRows"></dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- base ---- -->
+    <section class="console window" data-window="base" data-width="460" aria-label="Base and encoding converter" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot window__close" type="button" data-close="base" aria-label="Close base"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="console__title">base.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="tool tool--divided">
+          <div class="tool__group">
+            <span class="tool__label">number</span>
+            <div class="tool__grid">
+              <div class="tool__field">
+                <label class="tool__sublabel" for="baseDec">decimal</label>
+                <input class="tool__input" id="baseDec" data-radix="10" type="text" spellcheck="false" autocomplete="off" value="204" />
+              </div>
+              <div class="tool__field">
+                <label class="tool__sublabel" for="baseHex">hexadecimal</label>
+                <input class="tool__input" id="baseHex" data-radix="16" type="text" spellcheck="false" autocomplete="off" />
+              </div>
+              <div class="tool__field">
+                <label class="tool__sublabel" for="baseOct">octal</label>
+                <input class="tool__input" id="baseOct" data-radix="8" type="text" spellcheck="false" autocomplete="off" />
+              </div>
+              <div class="tool__field">
+                <label class="tool__sublabel" for="baseBin">binary</label>
+                <input class="tool__input" id="baseBin" data-radix="2" type="text" spellcheck="false" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <div class="tool__group">
+            <label class="tool__label" for="baseText">text</label>
+            <input class="tool__input" id="baseText" type="text" spellcheck="false" autocomplete="off" value="matthew.quest" />
+            <div class="tool__pills" role="group" aria-label="Transform">
+              <button class="tool__pill is-active" type="button" data-op="b64enc">base64</button>
+              <button class="tool__pill" type="button" data-op="b64dec">base64 decode</button>
+              <button class="tool__pill" type="button" data-op="urlenc">url</button>
+              <button class="tool__pill" type="button" data-op="urldec">url decode</button>
+            </div>
+            <output class="tool__output" id="baseOut"></output>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---- colour ---- -->
+    <section class="console window" data-window="colour" data-width="460" aria-label="Colour and contrast" hidden>
+      <header class="console__bar" title="Drag to move">
+        <button class="dot window__close" type="button" data-close="colour" aria-label="Close colour"></button>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="dot" aria-hidden="true"></span>
+        <span class="console__title">colour.sh</span>
+      </header>
+
+      <div class="console__body">
+        <div class="tool">
+          <div class="tool__group">
+            <label class="tool__label" for="colourInput">colour</label>
+            <div class="tool__inline">
+              <input class="tool__input" id="colourInput" type="text" spellcheck="false" autocomplete="off" value="#00cc00" />
+              <span class="tool__swatch" id="colourSwatch" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <dl class="tool__rows" id="colourRows"></dl>
+
+          <div class="tool__group">
+            <label class="tool__label" for="colourAgainst">contrast against</label>
+            <div class="tool__inline">
+              <input class="tool__input" id="colourAgainst" type="text" spellcheck="false" autocomplete="off" value="#0a0b0a" />
+              <span class="tool__swatch" id="againstSwatch" aria-hidden="true"></span>
+            </div>
+          </div>
+
+          <p class="tool__preview" id="colourPreview">the quick brown fox</p>
+
+          <div class="tool__result">
+            <span class="tool__ratio" id="colourRatio">—</span>
+            <div class="tool__badges" id="colourBadges"></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="../common.js?v=12"></script>
-  <script src="../script.js?v=8"></script>
+  <script src="convert.js?v=9"></script>
+  <script src="epoch.js?v=1"></script>
+  <script src="base.js?v=1"></script>
+  <script src="colour.js?v=1"></script>
+  <script src="../desktop.js?v=7"></script>
 </body>
 </html>

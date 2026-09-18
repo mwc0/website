@@ -28,7 +28,7 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=20">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 
@@ -109,27 +109,38 @@
 
       <article class="showcase__panel" id="showcaseTools">
         <h2 class="showcase__panel-title">tools</h2>
-        <p class="showcase__panel-desc">converter</p>
-        <dl class="unit-table">
-          <div class="unit-table__row">
-            <dt>length</dt>
-            <dd>mm cm m km in ft yd mi</dd>
-          </div>
-          <div class="unit-table__row">
-            <dt>weight</dt>
-            <dd>mg g kg t oz lb</dd>
-          </div>
-          <div class="unit-table__row">
-            <dt>temp</dt>
-            <dd>C F K</dd>
-          </div>
-          <div class="unit-table__row">
-            <dt>currency</dt>
-            <dd>USD EUR GBP JPY CAD AUD</dd>
-          </div>
-        </dl>
+        <div class="showcase__game-list">
+          <a class="showcase__game" href="tools/?open=convert">
+            <span class="showcase__game-icon"><span class="icon-convert" aria-hidden="true"><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">convert</span>
+              <span class="showcase__game-desc">length, weight, temperature, currency</span>
+            </span>
+          </a>
+          <a class="showcase__game" href="tools/?open=epoch">
+            <span class="showcase__game-icon"><span class="icon-epoch" aria-hidden="true"><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">epoch</span>
+              <span class="showcase__game-desc">unix timestamps, both directions</span>
+            </span>
+          </a>
+          <a class="showcase__game" href="tools/?open=base">
+            <span class="showcase__game-icon"><span class="icon-base" aria-hidden="true"><span></span><span></span><span></span><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">base</span>
+              <span class="showcase__game-desc">hex, binary, base64, url encoding</span>
+            </span>
+          </a>
+          <a class="showcase__game" href="tools/?open=colour">
+            <span class="showcase__game-icon"><span class="icon-colour" aria-hidden="true"><span></span></span></span>
+            <span class="showcase__game-copy">
+              <span class="showcase__game-name">colour</span>
+              <span class="showcase__game-desc">hex to oklch, and contrast ratios</span>
+            </span>
+          </a>
+        </div>
         <a class="showcase__link" href="tools/">
-          open converter
+          see all tools
           <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </article>

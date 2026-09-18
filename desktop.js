@@ -1,11 +1,13 @@
 /*
- * Games desktop: icons open each game in a draggable window.
+ * Desktop: icons open each game or tool in a draggable window. Shared by the
+ * games and tools pages, which are the same surface with different contents.
  *
- * Every game lives on this one page, so all three key handlers are bound to
- * window at once. Games ask hasFocus(id) before acting on a keystroke, which
- * is what stops an arrow key driving the snake and the runner at the same
- * time. Windows also get desktop:open / :close / :focus / :blur events so a
- * game can size itself when shown and pause itself when it loses focus.
+ * Everything on a desktop lives on one page, so all the key handlers are
+ * bound to window at once. Games ask hasFocus(id) before acting on a
+ * keystroke, which is what stops an arrow key driving the snake and the
+ * runner at the same time. Windows also get desktop:open / :close / :focus /
+ * :blur events so a game can size itself when shown and pause itself when it
+ * loses focus.
  */
 window.Desktop = (function () {
   const root = document.querySelector('[data-desktop]');

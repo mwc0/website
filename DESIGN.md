@@ -1,6 +1,6 @@
 ---
 name: matthew.quest
-description: A desktop of draggable terminal windows for browser games and a converter
+description: A desktop of draggable terminal windows for browser games and small utilities
 colors:
   phosphor-green: "#00cc00"
   ink: "#0a0b0a"
@@ -89,7 +89,7 @@ components:
 
 **Creative North Star: "The Desktop Utility"**
 
-Every surface on matthew.quest is a window on a desktop, not a page in a document. Games and the hero terminal live inside `.console` panels with a title bar, drag handle, and resize corners; the games page is explicitly a desktop you open icons onto. Even where a panel is pinned in place (the hero terminal, the tools converter), it keeps the console chrome so the metaphor reads consistently whether or not that instance actually moves.
+Every surface on matthew.quest is a window on a desktop, not a page in a document. Games, tools, and the hero terminal live inside `.console` panels with a title bar, drag handle, and resize corners; the games and tools pages are both explicitly desktops you open icons onto. Even where a panel is pinned in place (the hero terminal), it keeps the console chrome so the metaphor reads consistently whether or not that instance actually moves.
 
 The voice is utilitarian first: the terminal look is a byproduct of clarity and function, not a costume laid over an ordinary site. One typeface, IBM Plex Mono, carries every role from the 50px hero title down to an 11px hint, because a desktop utility doesn't switch fonts to seem friendlier. Color is restrained and functional, phosphor green marks what's active, live, or actionable, and almost nothing else carries color at rest.
 
@@ -97,7 +97,7 @@ Two themes exist, dark (the default, and the system's true identity) and light (
 
 **Key Characteristics:**
 - Single monospace voice across every text role, no display/body font pairing.
-- Windows, not sections: draggable, resizable `.console` panels are the primary layout unit.
+- Windows, not sections: draggable, resizable `.console` panels are the primary layout unit, and a new game or tool is an icon plus a window rather than a new page.
 - Flat at rest; shadow and lift are earned by interaction, not applied by default.
 - Phosphor green is scarce and meaningful: live status, the active tab, a correct Wordle tile, a focused input border.
 - Dark is the native theme; light is a faithful token-for-token remap, not a separate design.
@@ -150,11 +150,11 @@ Two components carry their own fluid, container-scaled type outside this hierarc
 
 ## Layout
 
-Content is capped and centered: `1180px` for the homepage, `620px` for the single-console games/tools pages. A `56px` fixed header (`--header-h`) sits above everything at `z-index: 9000`; page content pads top to clear it rather than scrolling under it.
+Content is capped and centered at `1180px` on the homepage. A `56px` fixed header (`--header-h`) sits above everything at `z-index: 9000`; page content pads top to clear it rather than scrolling under it.
 
 The homepage hero is a two-column grid (title/CTAs beside the live terminal) that collapses to one column under `860px`. The showcase section below it is an intentionally asymmetric two-column grid (`1.4fr` / `1fr`), panels align to their own content height rather than stretching to match each other.
 
-The games page is a blank desktop: icons sit top-left in a fixed-width column, and windows the user opens are positioned absolutely and float free, bounded by the header and a soft rubber-band resistance at the viewport edges rather than a hard stop.
+Games and tools are both blank desktops, built from the same code: icons sit top-left in a fixed-width column, and windows the user opens are positioned absolutely and float free, bounded by the header and a soft rubber-band resistance at the viewport edges rather than a hard stop. A new game or tool is an icon and a `.console`, never a new page layout. The graph-paper grid backdrop marks a desktop and appears on those two pages only.
 
 ## Elevation & Depth
 
