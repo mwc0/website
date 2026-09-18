@@ -59,6 +59,16 @@
   let moveLeft = false;
   let moveRight = false;
 
+  // Every constant below (speed, gravity, accel...) is tuned in "units per
+  // frame at 60fps". requestAnimationFrame fires at the display's own rate
+  // though, not a fixed 60Hz, so update() scales each one by dt: how many
+  // 1/60s slices actually elapsed since the last frame. dt stays 1 on a
+  // 60Hz screen (unchanged from before), drops toward 0.4 on 144Hz, and
+  // rises above 1 if a frame is dropped, so the run plays at the same real
+  // -world speed everywhere.
+  let lastTime = null;
+  const MAX_DT = 4; // caps the catch-up jump after a stall or tab switch
+
   function cssVar(name, fallback) {
     // Read from the canvas, not the root: the game screen keeps its own dark
     // palette when the page is in the light theme.
@@ -379,18 +389,20 @@
 
   // Slide along the current wall. Past either edge the player rounds the
   // corner onto the neighbouring wall and the view turns to put it underfoot.
-  function steer() {
+  function steer(dt) {
     const dir = (moveRight ? 1 : 0) - (moveLeft ? 1 : 0);
     if (dir) {
-      vx += dir * MOVE_ACCEL;
+      vx += dir * MOVE_ACCEL * dt;
     } else {
-      vx *= MOVE_FRICTION;
+      // Exponential decay, so the fraction shed has to scale by dt itself
+      // (not just multiply by it) to decay at the same real-world rate.
+      vx *= Math.pow(MOVE_FRICTION, dt);
       if (Math.abs(vx) < 0.0004) vx = 0;
     }
     vx = Math.max(-MOVE_MAX, Math.min(MOVE_MAX, vx));
     if (!vx) return;
 
-    localX += vx;
+    localX += vx * dt;
     while (localX > R) {
       localX -= 2 * R;
       sideTurns += 1;
@@ -434,11 +446,11 @@
     overlay.classList.remove('is-hidden');
   }
 
-  function update() {
+  function update(dt) {
     if (falling) {
       // Tumble away through the hole before the overlay appears.
-      height -= 0.055;
-      fallSpin += 0.22;
+      height -= 0.055 * dt;
+      fallSpin += 0.22 * dt;
       if (height < -3.2) {
         falling = false;
         die();
@@ -448,17 +460,19 @@
 
     if (!alive) return;
 
-    speed = Math.min(MAX_SPEED, speed + SPEED_RAMP);
-    travelled += speed;
-    steer();
+    speed = Math.min(MAX_SPEED, speed + SPEED_RAMP * dt);
+    travelled += speed * dt;
+    steer(dt);
 
-    // Ease the tube around when the player rounds a corner.
-    const turnStep = reduceMotion ? 1 : TURN_EASE;
+    // Ease the tube around when the player rounds a corner. Converting the
+    // per-frame ease fraction to a dt-scaled one keeps the same real-world
+    // easing curve regardless of how many frames it's spread across.
+    const turnStep = reduceMotion ? 1 : 1 - Math.pow(1 - TURN_EASE, dt);
     viewAngle += (viewTarget - viewAngle) * turnStep;
 
     if (airborne) {
-      height += vy;
-      vy -= GRAVITY;
+      height += vy * dt;
+      vy -= GRAVITY * dt;
       if (height <= 0) {
         height = 0;
         vy = 0;
@@ -490,8 +504,13 @@
     }
   }
 
-  function loop() {
-    update();
+  function loop(now) {
+    // First frame back after a start, resume, or a genuine stall: lastTime is
+    // stale (or unset), so treat this tick as free rather than let a huge dt
+    // fling the player through a wall.
+    const dt = lastTime === null ? 0 : Math.min(MAX_DT, (now - lastTime) / (1000 / 60));
+    lastTime = now;
+    update(dt);
     draw();
     if (alive || falling) {
       rafId = requestAnimationFrame(loop);
@@ -503,6 +522,7 @@
     resetState();
     running = true;
     overlay.classList.add('is-hidden');
+    lastTime = null;
     rafId = requestAnimationFrame(loop);
   }
 
@@ -625,7 +645,10 @@
   }
 
   function resumeLoop() {
-    if (running && (alive || falling) && rafId === null) rafId = requestAnimationFrame(loop);
+    if (running && (alive || falling) && rafId === null) {
+      lastTime = null;
+      rafId = requestAnimationFrame(loop);
+    }
   }
 
   const hostWindow = document.querySelector('[data-window="tunnel"]');
