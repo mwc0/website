@@ -1,5 +1,5 @@
 /*
- * colour.sh: one colour in four notations, plus what it scores against a
+ * colour: one colour in four notations, plus what it scores against a
  * background.
  *
  * The contrast half is the reason this exists: the site's own palette has to
@@ -17,6 +17,8 @@
   const ratioEl = document.getElementById('colourRatio');
   const badgesEl = document.getElementById('colourBadges');
   const preview = document.getElementById('colourPreview');
+  const noteEl = document.getElementById('colourNote');
+  const againstNoteEl = document.getElementById('againstNote');
 
   // ---- parsing ----
 
@@ -145,42 +147,11 @@
     { label: 'AAA large', min: 4.5 },
   ];
 
-  const cells = new Map();
-  let copyTimer;
+  const rows = Readout.rows(rowsEl, ROWS.map((row) => row.key));
 
-  function copy(btn) {
-    const text = btn.dataset.value || '';
-    if (!text || !navigator.clipboard) return;
-    navigator.clipboard.writeText(text).then(() => {
-      clearTimeout(copyTimer);
-      btn.classList.add('is-copied');
-      copyTimer = setTimeout(() => btn.classList.remove('is-copied'), 900);
-    }, () => {});
-  }
-
-  function buildRows() {
-    const frag = document.createDocumentFragment();
-    for (const row of ROWS) {
-      const wrap = document.createElement('div');
-      wrap.className = 'tool__row';
-
-      const dt = document.createElement('dt');
-      dt.textContent = row.key;
-
-      const dd = document.createElement('dd');
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tool__value';
-      btn.title = 'Copy';
-      btn.addEventListener('click', () => copy(btn));
-      dd.appendChild(btn);
-
-      wrap.append(dt, dd);
-      frag.appendChild(wrap);
-      cells.set(row.key, btn);
-    }
-    rowsEl.appendChild(frag);
-  }
+  // Naming the three notations it does take is more use than saying the input
+  // was wrong, since the answer is almost always one of them.
+  const HINT = 'not a colour — try #93a4ff, rgb(147, 164, 255) or hsl(231, 100%, 79%)';
 
   function buildBadges() {
     for (const level of LEVELS) {
@@ -196,23 +167,16 @@
     const colour = parse(input.value);
     const backdrop = parse(against.value);
 
-    input.classList.toggle('is-invalid', !colour);
-    against.classList.toggle('is-invalid', !backdrop);
+    Readout.invalid(input, !colour);
+    Readout.invalid(against, !backdrop);
+    noteEl.textContent = colour ? '' : HINT;
+    againstNoteEl.textContent = backdrop ? '' : HINT;
 
     if (colour) {
-      for (const row of ROWS) {
-        const value = row.get(colour);
-        const btn = cells.get(row.key);
-        btn.dataset.value = value;
-        btn.textContent = value;
-      }
+      for (const row of ROWS) rows.set(row.key, row.get(colour));
       swatch.style.background = toHex(colour);
     } else {
-      for (const row of ROWS) {
-        const btn = cells.get(row.key);
-        btn.dataset.value = '';
-        btn.textContent = '—';
-      }
+      rows.clear();
       swatch.style.background = 'transparent';
     }
 
@@ -239,7 +203,6 @@
     });
   }
 
-  buildRows();
   buildBadges();
   [input, against].forEach((el) => el.addEventListener('input', update));
   update();

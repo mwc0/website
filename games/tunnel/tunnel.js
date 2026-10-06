@@ -86,12 +86,12 @@
   const palette = {};
 
   function readPalette() {
-    palette.accent = cssVar('--accent', '#00cc00');
-    palette.accentRgb = hexToRgb(palette.accent, [0, 204, 0]);
-    palette.danger = cssVar('--danger', '#ff6b5e');
-    palette.dangerRgb = hexToRgb(palette.danger, [255, 107, 94]);
-    palette.void = cssVar('--bg', '#0a0b0a');
-    palette.voidRgb = hexToRgb(palette.void, [10, 11, 10]);
+    palette.accent = cssVar('--accent', '#93a4ff');
+    palette.accentRgb = hexToRgb(palette.accent, [147, 164, 255]);
+    palette.danger = cssVar('--danger', '#ff7a6e');
+    palette.dangerRgb = hexToRgb(palette.danger, [255, 122, 110]);
+    palette.void = cssVar('--bg', '#04050d');
+    palette.voidRgb = hexToRgb(palette.void, [4, 5, 13]);
   }
 
   function setupCanvas() {

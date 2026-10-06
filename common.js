@@ -319,47 +319,33 @@
     });
   })();
 
-  // ---- Hero terminal: live visitor count (home page only) ----
-  const heroTerminal = document.getElementById('heroTerminal');
-  if (heroTerminal) {
+  // ---- Hero: live visitor count and clock (home page only) ----
+  const countEl = document.getElementById('presenceCount');
+  if (countEl) {
+    const words = document.getElementById('presenceWords');
+    const clock = document.getElementById('heroClock');
+
     function describePresence(count) {
-      if (count === 'unavailable') return 'live count unavailable';
-      if (count === null) return 'counting…';
-      return count === 1 ? ' person here right now' : ' people here right now';
+      if (count === 'unavailable') return 'Live count unavailable';
+      if (count === null) return 'Counting who is here';
+      return count === 1 ? 'person here right now' : 'people here right now';
     }
-
-    heroTerminal.textContent = '';
-
-    const clockLine = document.createElement('div');
-    clockLine.className = 'hero-terminal__clock';
-    heroTerminal.appendChild(clockLine);
 
     function updateClock() {
       const now = new Date();
-      const time = now.toLocaleTimeString([], {
+      clock.dateTime = now.toISOString();
+      clock.textContent = now.toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
         hour12: false,
         timeZoneName: 'short',
       });
-      clockLine.textContent = time;
     }
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    const line = document.createElement('div');
-    line.className = 'hero-terminal__live';
-    const dot = document.createElement('span');
-    dot.className = 'hero-terminal__live-dot';
-    const label = document.createElement('span');
-    const countEl = document.createElement('span');
-    countEl.className = 'hero-terminal__count';
-    const words = document.createElement('span');
-    label.append(countEl, words);
-    line.appendChild(dot);
-    line.appendChild(label);
-    heroTerminal.appendChild(line);
+    if (clock) {
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
 
     // The number rolls in the direction it moved: up when someone arrives,
     // down when someone leaves. The first real count just appears.
@@ -405,9 +391,41 @@
       }
     }
     onPresence(showCount);
-
-    const cursor = document.createElement('span');
-    cursor.className = 'hero-terminal__cursor';
-    heroTerminal.appendChild(cursor);
   }
+
+  // ---- Header: clear over the top of a page, frosted once content runs under it ----
+  const siteHeader = document.querySelector('.site-header');
+  if (siteHeader) {
+    const markScrolled = () => siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+    markScrolled();
+    window.addEventListener('scroll', markScrolled, { passive: true });
+  }
+
+  // ---- Reveal on scroll ----
+  // style.css hides [data-reveal] only when scripts run and motion is welcome,
+  // so anything this misses is simply visible.
+  const revealables = document.querySelectorAll('[data-reveal]');
+  if (revealables.length) {
+    if (!('IntersectionObserver' in window) || prefersReducedMotion) {
+      revealables.forEach((el) => el.classList.add('is-in'));
+    } else {
+      const seen = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          seen.unobserve(entry.target);
+        });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+      revealables.forEach((el) => seen.observe(el));
+    }
+  }
+
+  // ---- Plates: a patch of light follows the pointer ----
+  document.querySelectorAll('[data-glow]').forEach((plate) => {
+    plate.addEventListener('pointermove', (e) => {
+      const rect = plate.getBoundingClientRect();
+      plate.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+      plate.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+    });
+  });
 })();

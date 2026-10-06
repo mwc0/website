@@ -12,12 +12,14 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#04050d">
 <title>matthew.quest/tools</title>
 <meta name="description" content="A unit and currency converter, unix timestamps, hex and base64, and colour contrast. All of it runs in the browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="../images/favicon.ico?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400..600&family=Host+Grotesk:wght@400..600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="../images/favicon.svg?v=3">
+<link rel="icon" type="image/x-icon" href="../images/favicon.ico?v=3" sizes="any">
 <script>
   // Set the theme before first paint so a light-theme visitor never sees a
   // dark flash. A saved choice wins; otherwise follow the system setting.
@@ -28,7 +30,7 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="../style.css?v=23">
+<link rel="stylesheet" href="../style.css?v=26">
 <script>
   // Record how this page was revealed (with or without a cross-page view
   // transition) before first paint, which can land before desktop.js loads.
@@ -39,82 +41,92 @@
 </head>
 <body class="body--desktop">
 
-  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="backdrop" aria-hidden="true">
+    <span class="beam-light"></span>
+    <span class="dot-field"></span>
+  </div>
 
   <header class="site-header">
-    <a class="site-header__brand" href="../">matthew<em>.</em>quest</a>
-    <nav class="site-tabs" aria-label="Site">
-      <a class="site-tab" href="../games/">games</a>
-      <a class="site-tab" href="./" aria-current="page">tools</a>
-    </nav>
-    <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
-      <span class="theme-toggle__thumb" aria-hidden="true"></span>
-      <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-      </svg>
-      <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <a class="site-header__brand" href="../" aria-label="matthew.quest, home">
+      <span class="site-header__name">matthew.quest</span>
+      <svg class="icon site-header__mark" aria-hidden="true"><use href="../images/icons.svg#i-mark"/></svg>
+    </a>
+    <div class="site-header__end">
+      <nav class="site-tabs" aria-label="Site">
+        <a class="site-tab" href="../games/">Games</a>
+        <a class="site-tab" href="./" aria-current="page">Tools</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
+        <span class="theme-toggle__thumb" aria-hidden="true"></span>
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main class="desktop" data-desktop>
-    <h1 class="visually-hidden">tools</h1>
-
     <ul class="desktop__icons">
       <li>
         <button class="desktop-icon" type="button" data-open="convert">
-          <span class="desktop-icon__glyph">
-            <span class="icon-convert" aria-hidden="true"><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="convert">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-convert"/></svg>
           </span>
-          <span class="desktop-icon__label">convert</span>
+          <span class="desktop-icon__label">Convert</span>
         </button>
       </li>
       <li>
         <button class="desktop-icon" type="button" data-open="epoch">
-          <span class="desktop-icon__glyph">
-            <span class="icon-epoch" aria-hidden="true"><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="epoch">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-epoch"/></svg>
           </span>
-          <span class="desktop-icon__label">epoch</span>
+          <span class="desktop-icon__label">Epoch</span>
         </button>
       </li>
       <li>
         <button class="desktop-icon" type="button" data-open="base">
-          <span class="desktop-icon__glyph">
-            <span class="icon-base" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="base">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-base"/></svg>
           </span>
-          <span class="desktop-icon__label">base</span>
+          <span class="desktop-icon__label">Base</span>
         </button>
       </li>
       <li>
         <button class="desktop-icon" type="button" data-open="colour">
-          <span class="desktop-icon__glyph">
-            <span class="icon-colour" aria-hidden="true"><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="colour">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-colour"/></svg>
           </span>
-          <span class="desktop-icon__label">colour</span>
+          <span class="desktop-icon__label">Colour</span>
         </button>
       </li>
     </ul>
 
-    <p class="desktop__hint">click one to open it</p>
+    <div class="desktop__empty">
+      <h1 class="desktop__title frame">Tools</h1>
+      <p class="desktop__hint">Pick an icon to open it. Click any value to copy it.</p>
+    </div>
 
     <!-- ---- convert ---- -->
     <section class="console window" data-window="convert" data-width="470" aria-label="Converter" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="convert" aria-label="Close converter"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">convert.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-convert"/></svg>
+        <span class="console__title">Convert</span>
+        <button class="window__close" type="button" data-close="convert" aria-label="Close converter">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
         <div class="converter">
-          <div class="converter__tabs" role="tablist" aria-label="Converter category">
-            <button class="converter__tab is-active" data-category="length" type="button">length</button>
-            <button class="converter__tab" data-category="weight" type="button">weight</button>
-            <button class="converter__tab" data-category="temperature" type="button">temp</button>
-            <button class="converter__tab" data-category="currency" type="button">currency</button>
+          <div class="converter__tabs" role="group" aria-label="Converter category">
+            <button class="converter__tab is-active" data-category="length" type="button" aria-pressed="true">length</button>
+            <button class="converter__tab" data-category="weight" type="button" aria-pressed="false">weight</button>
+            <button class="converter__tab" data-category="temperature" type="button" aria-pressed="false">temp</button>
+            <button class="converter__tab" data-category="currency" type="button" aria-pressed="false">currency</button>
           </div>
 
           <div class="converter__row">
@@ -135,9 +147,9 @@
             </div>
           </div>
 
-          <div class="converter__tabs converter__tabs--format" role="tablist" aria-label="Number format">
-            <button class="converter__format-btn is-active" data-format="decimal" type="button">decimal</button>
-            <button class="converter__format-btn" data-format="standard" type="button">standard form</button>
+          <div class="converter__tabs converter__tabs--format" role="group" aria-label="Number format">
+            <button class="converter__format-btn is-active" data-format="decimal" type="button" aria-pressed="true">decimal</button>
+            <button class="converter__format-btn" data-format="standard" type="button" aria-pressed="false">standard form</button>
           </div>
 
           <p class="converter__note" id="converterNote">1 metre = 3.28084 feet</p>
@@ -148,10 +160,11 @@
     <!-- ---- epoch ---- -->
     <section class="console window" data-window="epoch" data-width="440" aria-label="Timestamp converter" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="epoch" aria-label="Close epoch"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">epoch.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-epoch"/></svg>
+        <span class="console__title">Epoch</span>
+        <button class="window__close" type="button" data-close="epoch" aria-label="Close epoch">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -159,7 +172,7 @@
           <div class="tool__group">
             <label class="tool__label" for="epochInput">epoch or date <span class="tool__live" id="epochLive">tracking now</span></label>
             <div class="tool__inline">
-              <input class="tool__input" id="epochInput" type="text" spellcheck="false" autocomplete="off" placeholder="leave empty to follow the clock" />
+              <input class="tool__input" id="epochInput" type="text" spellcheck="false" autocomplete="off" aria-describedby="epochNote" placeholder="leave empty to follow the clock" />
               <button class="tool__pill" type="button" id="epochNow">now</button>
             </div>
             <p class="tool__note" id="epochNote">reading the clock every second</p>
@@ -173,10 +186,11 @@
     <!-- ---- base ---- -->
     <section class="console window" data-window="base" data-width="460" aria-label="Base and encoding converter" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="base" aria-label="Close base"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">base.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-base"/></svg>
+        <span class="console__title">Base</span>
+        <button class="window__close" type="button" data-close="base" aria-label="Close base">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -186,33 +200,37 @@
             <div class="tool__grid">
               <div class="tool__field">
                 <label class="tool__sublabel" for="baseDec">decimal</label>
-                <input class="tool__input" id="baseDec" data-radix="10" type="text" spellcheck="false" autocomplete="off" value="204" />
+                <input class="tool__input" id="baseDec" data-radix="10" type="text" spellcheck="false" autocomplete="off" aria-describedby="baseNumberNote" value="204" />
               </div>
               <div class="tool__field">
                 <label class="tool__sublabel" for="baseHex">hexadecimal</label>
-                <input class="tool__input" id="baseHex" data-radix="16" type="text" spellcheck="false" autocomplete="off" />
+                <input class="tool__input" id="baseHex" data-radix="16" type="text" spellcheck="false" autocomplete="off" aria-describedby="baseNumberNote" />
               </div>
               <div class="tool__field">
                 <label class="tool__sublabel" for="baseOct">octal</label>
-                <input class="tool__input" id="baseOct" data-radix="8" type="text" spellcheck="false" autocomplete="off" />
+                <input class="tool__input" id="baseOct" data-radix="8" type="text" spellcheck="false" autocomplete="off" aria-describedby="baseNumberNote" />
               </div>
               <div class="tool__field">
                 <label class="tool__sublabel" for="baseBin">binary</label>
-                <input class="tool__input" id="baseBin" data-radix="2" type="text" spellcheck="false" autocomplete="off" />
+                <input class="tool__input" id="baseBin" data-radix="2" type="text" spellcheck="false" autocomplete="off" aria-describedby="baseNumberNote" />
               </div>
             </div>
+            <p class="tool__note" id="baseNumberNote"></p>
           </div>
 
           <div class="tool__group">
             <label class="tool__label" for="baseText">text</label>
             <input class="tool__input" id="baseText" type="text" spellcheck="false" autocomplete="off" value="matthew.quest" />
             <div class="tool__pills" role="group" aria-label="Transform">
-              <button class="tool__pill is-active" type="button" data-op="b64enc">base64</button>
-              <button class="tool__pill" type="button" data-op="b64dec">base64 decode</button>
-              <button class="tool__pill" type="button" data-op="urlenc">url</button>
-              <button class="tool__pill" type="button" data-op="urldec">url decode</button>
+              <button class="tool__pill is-active" type="button" data-op="b64enc" aria-pressed="true">base64</button>
+              <button class="tool__pill" type="button" data-op="b64dec" aria-pressed="false">base64 decode</button>
+              <button class="tool__pill" type="button" data-op="urlenc" aria-pressed="false">url</button>
+              <button class="tool__pill" type="button" data-op="urldec" aria-pressed="false">url decode</button>
             </div>
-            <output class="tool__output" id="baseOut"></output>
+            <!-- aria-live is off because <output> is polite by default, which
+                 would re-read the whole string on every keystroke. base.js
+                 announces the settled value instead. -->
+            <output class="tool__output" id="baseOut" aria-live="off"></output>
           </div>
         </div>
       </div>
@@ -221,10 +239,11 @@
     <!-- ---- colour ---- -->
     <section class="console window" data-window="colour" data-width="460" aria-label="Colour and contrast" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="colour" aria-label="Close colour"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">colour.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-colour"/></svg>
+        <span class="console__title">Colour</span>
+        <button class="window__close" type="button" data-close="colour" aria-label="Close colour">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -232,9 +251,10 @@
           <div class="tool__group">
             <label class="tool__label" for="colourInput">colour</label>
             <div class="tool__inline">
-              <input class="tool__input" id="colourInput" type="text" spellcheck="false" autocomplete="off" value="#00cc00" />
+              <input class="tool__input" id="colourInput" type="text" spellcheck="false" autocomplete="off" aria-describedby="colourNote" value="#93a4ff" />
               <span class="tool__swatch" id="colourSwatch" aria-hidden="true"></span>
             </div>
+            <p class="tool__note" id="colourNote"></p>
           </div>
 
           <dl class="tool__rows" id="colourRows"></dl>
@@ -242,9 +262,10 @@
           <div class="tool__group">
             <label class="tool__label" for="colourAgainst">contrast against</label>
             <div class="tool__inline">
-              <input class="tool__input" id="colourAgainst" type="text" spellcheck="false" autocomplete="off" value="#0a0b0a" />
+              <input class="tool__input" id="colourAgainst" type="text" spellcheck="false" autocomplete="off" aria-describedby="againstNote" value="#04050d" />
               <span class="tool__swatch" id="againstSwatch" aria-hidden="true"></span>
             </div>
+            <p class="tool__note" id="againstNote"></p>
           </div>
 
           <p class="tool__preview" id="colourPreview">the quick brown fox</p>
@@ -259,11 +280,12 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../common.js?v=12"></script>
-  <script src="convert.js?v=9"></script>
-  <script src="epoch.js?v=1"></script>
-  <script src="base.js?v=1"></script>
-  <script src="colour.js?v=1"></script>
+  <script src="../common.js?v=13"></script>
+  <script src="convert.js?v=10"></script>
+  <script src="readout.js?v=1"></script>
+  <script src="epoch.js?v=2"></script>
+  <script src="base.js?v=2"></script>
+  <script src="colour.js?v=3"></script>
   <script src="../desktop.js?v=7"></script>
 </body>
 </html>

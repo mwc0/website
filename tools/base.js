@@ -1,5 +1,5 @@
 /*
- * base.sh: number bases and the two text encodings worth having to hand.
+ * base: number bases and the two text encodings worth having to hand.
  *
  * The four number fields are one value in four notations rather than a
  * from/to pair, so editing any of them rewrites the other three and there is
@@ -12,6 +12,7 @@
   const textIn = document.getElementById('baseText');
   const out = document.getElementById('baseOut');
   const pills = Array.from(document.querySelectorAll('[data-op]'));
+  const noteEl = document.getElementById('baseNumberNote');
 
   // ---- number bases ----
 
@@ -22,12 +23,15 @@
     16: /^[0-9a-f]+$/i,
   };
 
+  const NAMES = { 2: 'binary', 8: 'octal', 10: 'decimal', 16: 'hexadecimal' };
+  const ALLOWED = { 2: '0 and 1', 8: '0 to 7', 10: '0 to 9', 16: '0 to 9 and a to f' };
+
   function writeOthers(source, value) {
     for (const field of fields) {
       if (field === source) continue;
       const radix = Number(field.dataset.radix);
       field.value = value.toString(radix).toUpperCase();
-      field.classList.remove('is-invalid');
+      Readout.invalid(field, false);
     }
   }
 
@@ -38,19 +42,31 @@
     }
   }
 
+  // Three fields emptying themselves is the loudest thing that happens here,
+  // and on its own it doesn't say why. The note does.
+  function refuse(field, reason) {
+    Readout.invalid(field, true);
+    noteEl.textContent = reason;
+    blankOthers(field);
+  }
+
+  function accept(field) {
+    Readout.invalid(field, false);
+    noteEl.textContent = '';
+  }
+
   function readNumber(field) {
     const radix = Number(field.dataset.radix);
     const text = field.value.trim().replace(/^0[bxo]/i, '');
 
     if (!text) {
-      field.classList.remove('is-invalid');
+      accept(field);
       blankOthers(field);
       return;
     }
 
     if (!DIGITS[radix].test(text)) {
-      field.classList.add('is-invalid');
-      blankOthers(field);
+      refuse(field, NAMES[radix] + ' takes ' + ALLOWED[radix] + ' only');
       return;
     }
 
@@ -58,12 +74,11 @@
     // Past 2^53 the other bases would be rounded rather than converted, and a
     // wrong answer that looks right is worse than refusing.
     if (!Number.isSafeInteger(value)) {
-      field.classList.add('is-invalid');
-      blankOthers(field);
+      refuse(field, 'too large to convert exactly — the limit is ' + Number.MAX_SAFE_INTEGER + ' in decimal');
       return;
     }
 
-    field.classList.remove('is-invalid');
+    accept(field);
     writeOthers(field, value);
   }
 
@@ -95,6 +110,17 @@
   };
 
   let op = 'b64enc';
+  let sayTimer;
+
+  // The output carries aria-live="off", because a live <output> re-reads the
+  // whole string on every keystroke. Waiting for a pause turns thirteen
+  // announcements of a growing base64 string into one of the finished answer.
+  function say() {
+    clearTimeout(sayTimer);
+    const text = out.textContent;
+    if (!text) return;
+    sayTimer = setTimeout(() => Readout.announce(text), 700);
+  }
 
   function runText() {
     const text = textIn.value;
@@ -117,12 +143,19 @@
   pills.forEach((pill) => {
     pill.addEventListener('click', () => {
       op = pill.dataset.op;
-      pills.forEach((p) => p.classList.toggle('is-active', p === pill));
+      pills.forEach((p) => {
+        const on = p === pill;
+        p.classList.toggle('is-active', on);
+        p.setAttribute('aria-pressed', String(on));
+      });
       runText();
+      say();
     });
   });
 
-  textIn.addEventListener('input', runText);
+  // say() hangs off the events rather than off runText, so the value the
+  // window opens with isn't read out at nobody in particular.
+  textIn.addEventListener('input', () => { runText(); say(); });
 
   readNumber(document.getElementById('baseDec'));
   runText();

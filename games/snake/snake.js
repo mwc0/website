@@ -72,13 +72,13 @@
   const palette = {};
 
   function readPalette() {
-    palette.board = cssVar('--bg-well', '#0d0f0d');
-    palette.accent = cssVar('--accent', '#00cc00');
-    palette.accentRgb = hexToRgb(palette.accent, [0, 204, 0]);
-    palette.food = cssVar('--warn', '#e2c14c');
-    palette.foodRgb = hexToRgb(palette.food, [226, 193, 76]);
-    palette.danger = cssVar('--danger', '#ff6b5e');
-    palette.dangerRgb = hexToRgb(palette.danger, [255, 107, 94]);
+    palette.board = cssVar('--bg-well', '#060813');
+    palette.accent = cssVar('--accent', '#93a4ff');
+    palette.accentRgb = hexToRgb(palette.accent, [147, 164, 255]);
+    palette.food = cssVar('--warn', '#f0c35a');
+    palette.foodRgb = hexToRgb(palette.food, [240, 195, 90]);
+    palette.danger = cssVar('--danger', '#ff7a6e');
+    palette.dangerRgb = hexToRgb(palette.danger, [255, 122, 110]);
   }
 
   function rgba(rgb, a) {

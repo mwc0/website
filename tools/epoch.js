@@ -1,5 +1,5 @@
 /*
- * epoch.sh: unix timestamps in both directions.
+ * epoch: unix timestamps in both directions.
  *
  * With the field empty the window follows the clock, so opening it answers
  * "what is the time right now" without typing anything. Type an epoch or a
@@ -65,65 +65,17 @@
     return isNaN(date.getTime()) ? null : date;
   }
 
-  const cells = new Map();
-
-  function buildRows() {
-    const frag = document.createDocumentFragment();
-    for (const row of ROWS) {
-      const wrap = document.createElement('div');
-      wrap.className = 'tool__row';
-
-      const dt = document.createElement('dt');
-      dt.textContent = row.key;
-
-      const dd = document.createElement('dd');
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'tool__value';
-      btn.title = 'Copy';
-      btn.addEventListener('click', () => copy(btn));
-      dd.appendChild(btn);
-
-      wrap.append(dt, dd);
-      frag.appendChild(wrap);
-      cells.set(row.key, btn);
-    }
-    rowsEl.appendChild(frag);
-  }
-
-  let copyTimer;
-
-  function copy(btn) {
-    const text = btn.dataset.value || '';
-    if (!text || !navigator.clipboard) return;
-    navigator.clipboard.writeText(text).then(() => {
-      clearTimeout(copyTimer);
-      // The whole row flashes accent, which is the one thing on the page that
-      // confirms the copy actually happened.
-      btn.classList.add('is-copied');
-      copyTimer = setTimeout(() => btn.classList.remove('is-copied'), 900);
-    }, () => {});
-  }
+  const rows = Readout.rows(rowsEl, ROWS.map((row) => row.key));
 
   function render(date) {
     for (const row of ROWS) {
-      const btn = cells.get(row.key);
-      let value;
+      // toISOString throws outside the range Date can represent, and one
+      // unrepresentable row shouldn't take the other five with it.
       try {
-        value = row.get(date);
+        rows.set(row.key, row.get(date));
       } catch (e) {
-        value = '—';
+        rows.unset(row.key);
       }
-      btn.dataset.value = value;
-      btn.textContent = value;
-    }
-  }
-
-  function clear() {
-    for (const row of ROWS) {
-      const btn = cells.get(row.key);
-      btn.dataset.value = '';
-      btn.textContent = '—';
     }
   }
 
@@ -134,19 +86,20 @@
   function update() {
     const live = tracking();
     liveEl.hidden = !live;
-    input.classList.remove('is-invalid');
 
     if (live) {
+      Readout.invalid(input, false);
       noteEl.textContent = 'reading the clock every second';
       render(new Date());
       return;
     }
 
     const date = parse(input.value);
+    Readout.invalid(input, !date);
+
     if (!date) {
-      input.classList.add('is-invalid');
-      noteEl.textContent = 'not a timestamp or a date this browser understands';
-      clear();
+      noteEl.textContent = 'not a timestamp or a date — try 1700000000 or 2023-11-14';
+      rows.clear();
       return;
     }
 
@@ -162,7 +115,6 @@
     input.focus();
   });
 
-  buildRows();
   update();
 
   // Only tick while the window is actually open; a closed window has nothing

@@ -12,12 +12,14 @@
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#04050d">
 <title>matthew.quest/games</title>
 <meta name="description" content="Snake, Wordle and Driftwalk, playable in draggable windows on matthew.quest.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="../images/favicon.ico?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400..600&family=Host+Grotesk:wght@400..600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="../images/favicon.svg?v=3">
+<link rel="icon" type="image/x-icon" href="../images/favicon.ico?v=3" sizes="any">
 <script>
   // Set the theme before first paint so a light-theme visitor never sees a
   // dark flash. A saved choice wins; otherwise follow the system setting.
@@ -28,7 +30,7 @@
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
   })();
 </script>
-<link rel="stylesheet" href="../style.css?v=23">
+<link rel="stylesheet" href="../style.css?v=26">
 <script>
   // Record how this page was revealed (with or without a cross-page view
   // transition) before first paint, which can land before desktop.js loads.
@@ -39,65 +41,75 @@
 </head>
 <body class="body--desktop">
 
-  <div class="grid-overlay" aria-hidden="true"></div>
+  <div class="backdrop" aria-hidden="true">
+    <span class="beam-light"></span>
+    <span class="dot-field"></span>
+  </div>
 
   <header class="site-header">
-    <a class="site-header__brand" href="../">matthew<em>.</em>quest</a>
-    <nav class="site-tabs" aria-label="Site">
-      <a class="site-tab" href="./" aria-current="page">games</a>
-      <a class="site-tab" href="../tools/">tools</a>
-    </nav>
-    <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
-      <span class="theme-toggle__thumb" aria-hidden="true"></span>
-      <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-      </svg>
-      <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <a class="site-header__brand" href="../" aria-label="matthew.quest, home">
+      <span class="site-header__name">matthew.quest</span>
+      <svg class="icon site-header__mark" aria-hidden="true"><use href="../images/icons.svg#i-mark"/></svg>
+    </a>
+    <div class="site-header__end">
+      <nav class="site-tabs" aria-label="Site">
+        <a class="site-tab" href="./" aria-current="page">Games</a>
+        <a class="site-tab" href="../tools/">Tools</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
+        <span class="theme-toggle__thumb" aria-hidden="true"></span>
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
   <main class="desktop" data-desktop>
-    <h1 class="visually-hidden">games</h1>
-
     <ul class="desktop__icons">
       <li>
         <button class="desktop-icon" type="button" data-open="snake">
-          <span class="desktop-icon__glyph">
-            <span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="snake">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-snake"/></svg>
           </span>
-          <span class="desktop-icon__label">snake</span>
+          <span class="desktop-icon__label">Snake</span>
         </button>
       </li>
       <li>
         <button class="desktop-icon" type="button" data-open="wordle">
-          <span class="desktop-icon__glyph">
-            <span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="wordle">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-wordle"/></svg>
           </span>
-          <span class="desktop-icon__label">wordle</span>
+          <span class="desktop-icon__label">Wordle</span>
         </button>
       </li>
       <li>
         <button class="desktop-icon" type="button" data-open="tunnel">
-          <span class="desktop-icon__glyph">
-            <span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span class="desktop-icon__glyph tile" data-vt="tunnel">
+            <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-tunnel"/></svg>
           </span>
-          <span class="desktop-icon__label">driftwalk</span>
+          <span class="desktop-icon__label">Driftwalk</span>
         </button>
       </li>
     </ul>
 
-    <p class="desktop__hint">click one to open it</p>
+    <div class="desktop__empty">
+      <h1 class="desktop__title frame">Games</h1>
+      <p class="desktop__hint">Pick an icon to open it. Windows drag, resize and stack.</p>
+    </div>
 
     <!-- ---- snake ---- -->
     <section class="console window" data-window="snake" data-width="470" aria-label="Snake" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="snake" aria-label="Close snake"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">snake.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-snake"/></svg>
+        <span class="console__title">Snake</span>
+        <button class="window__close" type="button" data-close="snake" aria-label="Close snake">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -144,10 +156,11 @@
     <!-- ---- wordle ---- -->
     <section class="console window" data-window="wordle" data-width="430" aria-label="Wordle" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="wordle" aria-label="Close wordle"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">wordle.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-wordle"/></svg>
+        <span class="console__title">Wordle</span>
+        <button class="window__close" type="button" data-close="wordle" aria-label="Close wordle">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -177,10 +190,11 @@
     <!-- ---- driftwalk ---- -->
     <section class="console window" data-window="tunnel" data-width="560" aria-label="Driftwalk" hidden>
       <header class="console__bar" title="Drag to move">
-        <button class="dot window__close" type="button" data-close="tunnel" aria-label="Close driftwalk"></button>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="dot" aria-hidden="true"></span>
-        <span class="console__title">driftwalk.sh</span>
+        <svg class="icon console__icon" aria-hidden="true"><use href="../images/icons.svg#i-tunnel"/></svg>
+        <span class="console__title">Driftwalk</span>
+        <button class="window__close" type="button" data-close="tunnel" aria-label="Close driftwalk">
+          <svg class="icon" aria-hidden="true"><use href="../images/icons.svg#i-close"/></svg>
+        </button>
       </header>
 
       <div class="console__body">
@@ -211,11 +225,11 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="../common.js?v=12"></script>
+  <script src="../common.js?v=13"></script>
   <script src="leaderboard.js?v=1"></script>
-  <script src="snake/snake.js?v=6"></script>
+  <script src="snake/snake.js?v=7"></script>
   <script src="wordle/wordle.js?v=2"></script>
-  <script src="tunnel/tunnel.js?v=6"></script>
+  <script src="tunnel/tunnel.js?v=7"></script>
   <script src="../desktop.js?v=7"></script>
 </body>
 </html>

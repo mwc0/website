@@ -13,11 +13,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>matthew.quest</title>
-<meta name="description" content="Snake, Wordle and Driftwalk, plus a unit and currency converter. All of it runs in the browser.">
+<meta name="description" content="Snake, Wordle and Driftwalk, plus a converter, timestamps, number bases and colour contrast. All of it runs in the browser.">
+<meta name="theme-color" content="#04050d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="icon" type="image/x-icon" href="images/favicon.ico?v=2">
+<link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400..600&family=Host+Grotesk:wght@400..600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="images/favicon.svg?v=3">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico?v=3" sizes="any">
 <script>
   // Set the theme before first paint so a light-theme visitor never sees a
   // dark flash. A saved choice wins; otherwise follow the system setting.
@@ -26,136 +28,329 @@
     try { saved = localStorage.getItem('theme'); } catch (e) {}
     var light = saved ? saved === 'light' : matchMedia('(prefers-color-scheme: light)').matches;
     document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    // Marks that scripts run, so reveal-on-scroll may hide things it will show.
+    document.documentElement.classList.add('js');
   })();
 </script>
-<link rel="stylesheet" href="style.css?v=23">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
 
   <header class="site-header">
-    <a class="site-header__brand" href="./">matthew<em>.</em>quest</a>
-    <nav class="site-tabs" aria-label="Site">
-      <a class="site-tab" href="games/">games</a>
-      <a class="site-tab" href="tools/">tools</a>
-    </nav>
-    <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
-      <span class="theme-toggle__thumb" aria-hidden="true"></span>
-      <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-      </svg>
-      <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-        <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
-        <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-    </button>
+    <a class="site-header__brand" href="./" aria-label="matthew.quest, home">
+      <span class="site-header__name">matthew.quest</span>
+      <svg class="icon site-header__mark" aria-hidden="true"><use href="images/icons.svg#i-mark"/></svg>
+    </a>
+    <div class="site-header__end">
+      <nav class="site-tabs" aria-label="Site">
+        <a class="site-tab" href="games/">Games</a>
+        <a class="site-tab" href="tools/">Tools</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Light theme">
+        <span class="theme-toggle__thumb" aria-hidden="true"></span>
+        <svg class="theme-toggle__icon theme-toggle__icon--moon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <svg class="theme-toggle__icon theme-toggle__icon--sun" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <circle cx="8" cy="8" r="2.9" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
   </header>
 
-  <div class="home">
-    <section class="hero">
-      <div class="hero__inner">
-        <div class="hero__content" id="heroContent">
-          <h1 class="hero__title">matthew<em>.</em>quest</h1>
-          <div class="hero__ctas">
-            <a class="btn btn--primary" href="games/">games</a>
-            <a class="btn btn--secondary" href="tools/">tools</a>
-          </div>
-        </div>
+  <main class="home">
 
-        <div class="hero__terminal console" id="heroTerminalPanel" data-static>
-          <header class="console__bar">
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="dot"></span>
-            <span class="console__title">guest@matthew.quest</span>
-          </header>
-          <div class="console__body">
-            <div class="hero-terminal__lines" id="heroTerminal"></div>
-          </div>
+    <!-- ---- hero ---- -->
+    <section class="hero">
+      <span class="beam-light" aria-hidden="true"></span>
+      <span class="dot-field" aria-hidden="true"></span>
+
+      <div class="hero__head frame">
+        <h1 class="hero__title">matthew.quest</h1>
+        <p class="hero__lede">Three games and four small tools, made by hand. Everything runs in your browser.</p>
+        <div class="hero__actions">
+          <a class="btn btn--lit" href="games/">
+            Play the games
+            <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+          </a>
+          <a class="btn btn--glass" href="tools/">Open the tools</a>
+        </div>
+      </div>
+
+      <div class="fan">
+        <a class="fan__card fan__card--left plate" href="games/?open=wordle" aria-label="Play Wordle">
+          <span class="fan__top">
+            <span class="fan__name">Wordle</span>
+            <span class="fan__note">No daily limit</span>
+          </span>
+          <span class="fan__stage fan__stage--tiles">
+            <!-- The finished board, so it reads without scripts. home.js
+                 clears it and plays the three guesses on a loop. -->
+            <span class="demo-wordle" id="demoWordle" aria-hidden="true">
+              <span class="demo-wordle__row">
+                <span class="demo-wordle__tile is-present">s</span><span class="demo-wordle__tile is-present">t</span><span class="demo-wordle__tile is-absent">a</span><span class="demo-wordle__tile is-absent">r</span><span class="demo-wordle__tile is-present">e</span>
+              </span>
+              <span class="demo-wordle__row">
+                <span class="demo-wordle__tile is-absent">g</span><span class="demo-wordle__tile is-correct">u</span><span class="demo-wordle__tile is-correct">e</span><span class="demo-wordle__tile is-correct">s</span><span class="demo-wordle__tile is-correct">t</span>
+              </span>
+              <span class="demo-wordle__row">
+                <span class="demo-wordle__tile is-correct">q</span><span class="demo-wordle__tile is-correct">u</span><span class="demo-wordle__tile is-correct">e</span><span class="demo-wordle__tile is-correct">s</span><span class="demo-wordle__tile is-correct">t</span>
+              </span>
+            </span>
+          </span>
+          <span class="fan__go">Play <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg></span>
+        </a>
+
+        <a class="fan__card fan__card--mid plate trace" href="games/?open=snake" aria-label="Play Snake">
+          <span class="fan__top">
+            <span class="fan__name">Snake</span>
+            <span class="fan__note">With a shared high score board</span>
+          </span>
+          <span class="fan__stage snake__stage--demo">
+            <canvas id="demoSnake" width="264" height="168" aria-hidden="true"></canvas>
+          </span>
+          <span class="fan__go">Play <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg></span>
+        </a>
+
+        <a class="fan__card fan__card--right plate" href="games/?open=tunnel" aria-label="Play Driftwalk">
+          <span class="fan__top">
+            <span class="fan__name">Driftwalk</span>
+            <span class="fan__note">An endless tunnel run</span>
+          </span>
+          <span class="fan__stage">
+            <canvas id="demoTunnel" width="264" height="168" aria-hidden="true"></canvas>
+          </span>
+          <span class="fan__go">Play <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg></span>
+        </a>
+      </div>
+
+      <p class="presence">
+        <span class="presence__dot" aria-hidden="true"></span>
+        <span class="presence__live"><span class="presence__count" id="presenceCount"></span><span id="presenceWords">Counting who is here</span></span>
+        <span class="presence__rule" aria-hidden="true"></span>
+        <time class="presence__clock" id="heroClock"></time>
+      </p>
+
+      <nav class="rail" aria-label="Everything on the site">
+        <ol class="rail__list">
+          <li class="rail__item" style="--n: 0">
+            <a class="rail__link" href="games/?open=snake">
+              <span class="tile" data-vt="snake"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-snake"/></svg></span>
+              <span class="rail__label">Snake</span>
+            </a>
+          </li>
+          <li class="rail__item" style="--n: 1">
+            <a class="rail__link" href="games/?open=wordle">
+              <span class="tile" data-vt="wordle"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-wordle"/></svg></span>
+              <span class="rail__label">Wordle</span>
+            </a>
+          </li>
+          <li class="rail__item" style="--n: 2">
+            <a class="rail__link" href="games/?open=tunnel">
+              <span class="tile" data-vt="tunnel"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-tunnel"/></svg></span>
+              <span class="rail__label">Driftwalk</span>
+            </a>
+          </li>
+          <li class="rail__item rail__item--tool rail__item--break" style="--n: 3">
+            <a class="rail__link" href="tools/?open=convert">
+              <span class="tile" data-vt="convert"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-convert"/></svg></span>
+              <span class="rail__label">Convert</span>
+            </a>
+          </li>
+          <li class="rail__item rail__item--tool" style="--n: 4">
+            <a class="rail__link" href="tools/?open=epoch">
+              <span class="tile" data-vt="epoch"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-epoch"/></svg></span>
+              <span class="rail__label">Epoch</span>
+            </a>
+          </li>
+          <li class="rail__item rail__item--tool" style="--n: 5">
+            <a class="rail__link" href="tools/?open=base">
+              <span class="tile" data-vt="base"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-base"/></svg></span>
+              <span class="rail__label">Base</span>
+            </a>
+          </li>
+          <li class="rail__item rail__item--tool" style="--n: 6">
+            <a class="rail__link" href="tools/?open=colour">
+              <span class="tile" data-vt="colour"><svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-colour"/></svg></span>
+              <span class="rail__label">Colour</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+    </section>
+
+    <!-- ---- tools ---- -->
+    <section class="band" aria-labelledby="toolsTitle">
+      <div class="wrap">
+        <header class="band__head" data-reveal="rise">
+          <h2 class="band__title" id="toolsTitle">Four tools, already running.</h2>
+          <p class="band__sub">Each one does a single job and states the answer plainly. These are live: open one and it picks up where this leaves off.</p>
+        </header>
+
+        <div class="bento frame" data-reveal>
+          <a class="bento__cell bento__cell--wide plate" href="tools/?open=convert" data-glow data-reveal="rise" style="--i: 0">
+            <div class="bento__demo">
+              <p class="readout" id="demoConvert"><span>1 m</span><span class="readout__eq">=</span><span>3.28084 ft</span></p>
+              <p class="readout__sub" id="demoConvertKind">length</p>
+            </div>
+            <div class="bento__meta">
+              <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-convert"/></svg>
+              <h3 class="bento__name">Convert</h3>
+              <svg class="icon bento__arrow" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+              <p class="bento__desc">Length, weight, temperature and currency, with live exchange rates.</p>
+            </div>
+          </a>
+
+          <a class="bento__cell bento__cell--narrow plate" href="tools/?open=epoch" data-glow data-reveal="rise" style="--i: 1">
+            <div class="bento__demo">
+              <p class="readout" id="demoEpoch">&nbsp;</p>
+              <p class="readout__sub" id="demoEpochIso">unix time, in seconds</p>
+            </div>
+            <div class="bento__meta">
+              <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-epoch"/></svg>
+              <h3 class="bento__name">Epoch</h3>
+              <svg class="icon bento__arrow" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+              <p class="bento__desc">Unix timestamps to dates, and back again.</p>
+            </div>
+          </a>
+
+          <a class="bento__cell bento__cell--narrow plate" href="tools/?open=base" data-glow data-reveal="rise" style="--i: 1">
+            <div class="bento__demo">
+              <span class="bits" id="demoBits" aria-hidden="true"><i class="is-on"></i><i class="is-on"></i><i></i><i></i><i class="is-on"></i><i class="is-on"></i><i></i><i></i></span>
+              <p class="readout__sub" id="demoBase">dec 204 &nbsp; hex cc &nbsp; oct 314</p>
+            </div>
+            <div class="bento__meta">
+              <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-base"/></svg>
+              <h3 class="bento__name">Base</h3>
+              <svg class="icon bento__arrow" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+              <p class="bento__desc">Decimal, hex, octal and binary, plus base64 and URL encoding.</p>
+            </div>
+          </a>
+
+          <a class="bento__cell bento__cell--wide plate" href="tools/?open=colour" data-glow data-reveal="rise" style="--i: 2">
+            <div class="bento__demo">
+              <!-- home.js measures this page's own ink against its own
+                   background and fills these in. -->
+              <ul class="audit" id="demoAudit" aria-label="This page's text colours, measured against its background">
+                <li class="audit__row"><span class="audit__swatch" style="color: var(--text)" aria-hidden="true">Aa</span><span>Text</span><span class="audit__ratio" data-ratio="--text">&nbsp;</span><span class="audit__grade" data-grade="--text">AAA</span></li>
+                <li class="audit__row"><span class="audit__swatch" style="color: var(--text-dim)" aria-hidden="true">Aa</span><span>Quiet text</span><span class="audit__ratio" data-ratio="--text-dim">&nbsp;</span><span class="audit__grade" data-grade="--text-dim">AA</span></li>
+                <li class="audit__row"><span class="audit__swatch" style="color: var(--accent)" aria-hidden="true">Aa</span><span>Accent</span><span class="audit__ratio" data-ratio="--accent">&nbsp;</span><span class="audit__grade" data-grade="--accent">AA</span></li>
+              </ul>
+            </div>
+            <div class="bento__meta">
+              <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-colour"/></svg>
+              <h3 class="bento__name">Colour</h3>
+              <svg class="icon bento__arrow" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+              <p class="bento__desc">One colour in four notations, and its contrast against another. Above: this page, checking itself.</p>
+            </div>
+          </a>
         </div>
       </div>
     </section>
 
-    <section class="showcase">
-      <article class="showcase__panel" id="showcaseGames">
-        <h2 class="showcase__panel-title">games</h2>
-        <div class="showcase__game-list">
-          <a class="showcase__game" href="games/?open=snake">
-            <span class="showcase__game-icon"><span class="icon-snake" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">Snake</span>
-              <span class="showcase__game-desc">grid snake, with a high score board</span>
-            </span>
-          </a>
-          <a class="showcase__game" href="games/?open=wordle">
-            <span class="showcase__game-icon"><span class="icon-wordle" aria-hidden="true"><span></span><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">Wordle</span>
-              <span class="showcase__game-desc">five letters, six guesses, no daily limit</span>
-            </span>
-          </a>
-          <a class="showcase__game" href="games/?open=tunnel">
-            <span class="showcase__game-icon"><span class="icon-tunnel" aria-hidden="true"><span></span><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">Driftwalk</span>
-              <span class="showcase__game-desc">keep running, jump the gaps</span>
-            </span>
-          </a>
-        </div>
-        <a class="showcase__link" href="games/">
-          see all games
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </article>
+    <!-- ---- ledger ---- -->
+    <section class="band" aria-labelledby="ledgerTitle">
+      <div class="wrap">
+        <header class="band__head" data-reveal="rise">
+          <h2 class="band__title" id="ledgerTitle">Nothing to sign up for.</h2>
+          <p class="band__sub">The whole site is a handful of static files. Here is what it does, and what it keeps.</p>
+        </header>
 
-      <article class="showcase__panel" id="showcaseTools">
-        <h2 class="showcase__panel-title">tools</h2>
-        <div class="showcase__game-list">
-          <a class="showcase__game" href="tools/?open=convert">
-            <span class="showcase__game-icon"><span class="icon-convert" aria-hidden="true"><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">convert</span>
-              <span class="showcase__game-desc">length, weight, temperature, currency</span>
-            </span>
-          </a>
-          <a class="showcase__game" href="tools/?open=epoch">
-            <span class="showcase__game-icon"><span class="icon-epoch" aria-hidden="true"><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">epoch</span>
-              <span class="showcase__game-desc">unix timestamps, both directions</span>
-            </span>
-          </a>
-          <a class="showcase__game" href="tools/?open=base">
-            <span class="showcase__game-icon"><span class="icon-base" aria-hidden="true"><span></span><span></span><span></span><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">base</span>
-              <span class="showcase__game-desc">hex, binary, base64, url encoding</span>
-            </span>
-          </a>
-          <a class="showcase__game" href="tools/?open=colour">
-            <span class="showcase__game-icon"><span class="icon-colour" aria-hidden="true"><span></span></span></span>
-            <span class="showcase__game-copy">
-              <span class="showcase__game-name">colour</span>
-              <span class="showcase__game-desc">hex to oklch, and contrast ratios</span>
-            </span>
-          </a>
+        <div class="ledger">
+          <dl class="ledger__list">
+            <div class="ledger__row" data-reveal="rule" style="--i: 0">
+              <dt>Accounts</dt>
+              <dd>None. There is no login anywhere on the site.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 1">
+              <dt>Where it runs</dt>
+              <dd>In your browser. The games and tools are plain scripts, with nothing to install.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 2">
+              <dt>Windows</dt>
+              <dd>Everything opens in a window you can drag, resize and stack, so a converter can sit beside a game.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 3">
+              <dt>High scores</dt>
+              <dd>Snake keeps one shared board. A run that makes the top ten earns three initials, arcade style.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 4">
+              <dt>Currency</dt>
+              <dd>Live exchange rates, with a built-in table to fall back on if the request fails.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 5">
+              <dt>Kept on your device</dt>
+              <dd>Your best scores, your initials and your theme choice. They stay in this browser.</dd>
+            </div>
+            <div class="ledger__row" data-reveal="rule" style="--i: 6">
+              <dt>Counted</dt>
+              <dd>Google Analytics counts page views, and a live counter shows how many people are here right now.</dd>
+            </div>
+          </dl>
+
+          <aside class="scores plate" aria-labelledby="scoresTitle" data-reveal="settle">
+            <header class="scores__head">
+              <h3 class="scores__title" id="scoresTitle">Snake high scores</h3>
+              <span class="scores__scope" id="homeScoresScope"></span>
+            </header>
+            <ol class="scores__list" id="homeScores"></ol>
+            <p class="scores__status" id="homeScoresStatus">Loading scores</p>
+            <a class="scores__link" href="games/?open=snake">
+              Try to beat it
+              <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-arrow"/></svg>
+            </a>
+          </aside>
         </div>
-        <a class="showcase__link" href="tools/">
-          see all tools
-          <svg class="btn__arrow" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M5 2L11 8L5 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-      </article>
+      </div>
     </section>
 
-    <footer class="site-footer">
-      <span class="site-footer__brand">matthew.quest</span>
-      <span class="site-footer__links">
-        <a href="games/">games</a>
-        <a href="tools/">tools</a>
+    <!-- ---- close ---- -->
+    <section class="band close" aria-labelledby="closeTitle">
+      <div class="wrap">
+        <h2 class="band__title close__title frame" id="closeTitle" data-reveal>Pick a desktop.</h2>
+
+        <div class="close__cards">
+          <a class="close__card plate" href="games/" data-glow data-reveal="settle" style="--i: 0">
+            <span class="stack" style="--count: 3" aria-hidden="true">
+              <span class="stack__win" style="--k: 0"><svg class="icon"><use href="images/icons.svg#i-snake"/></svg></span>
+              <span class="stack__win" style="--k: 1"><svg class="icon"><use href="images/icons.svg#i-wordle"/></svg></span>
+              <span class="stack__win" style="--k: 2"><svg class="icon"><use href="images/icons.svg#i-tunnel"/></svg></span>
+            </span>
+            <h3 class="close__name">Games</h3>
+            <p class="close__desc">Snake, Wordle and Driftwalk.</p>
+          </a>
+          <a class="close__card plate" href="tools/" data-glow data-reveal="settle" style="--i: 1">
+            <span class="stack" style="--count: 4" aria-hidden="true">
+              <span class="stack__win" style="--k: 0"><svg class="icon"><use href="images/icons.svg#i-convert"/></svg></span>
+              <span class="stack__win" style="--k: 1"><svg class="icon"><use href="images/icons.svg#i-epoch"/></svg></span>
+              <span class="stack__win" style="--k: 2"><svg class="icon"><use href="images/icons.svg#i-base"/></svg></span>
+              <span class="stack__win" style="--k: 3"><svg class="icon"><use href="images/icons.svg#i-colour"/></svg></span>
+            </span>
+            <h3 class="close__name">Tools</h3>
+            <p class="close__desc">Convert, Epoch, Base and Colour.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <span class="site-footer__brand">
+        <svg class="icon" aria-hidden="true"><use href="images/icons.svg#i-mark"/></svg>
+        matthew.quest
       </span>
-    </footer>
-  </div>
+      <span class="site-footer__links">
+        <a href="games/">Games</a>
+        <a href="tools/">Tools</a>
+      </span>
+    </div>
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-  <script src="common.js?v=12"></script>
+  <script src="common.js?v=13"></script>
+  <script src="games/leaderboard.js?v=1"></script>
+  <script src="home.js?v=1"></script>
 </body>
 </html>

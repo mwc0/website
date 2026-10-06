@@ -145,7 +145,11 @@
 
   function setCategory(category) {
     currentCategory = category;
-    tabs.forEach((tab) => tab.classList.toggle('is-active', tab.dataset.category === category));
+    tabs.forEach((tab) => {
+      const on = tab.dataset.category === category;
+      tab.classList.toggle('is-active', on);
+      tab.setAttribute('aria-pressed', String(on));
+    });
     populateUnits(category);
     fromValue.value = 1;
     runConversion();
@@ -197,7 +201,10 @@
   formatButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       numberFormat = btn.dataset.format;
-      formatButtons.forEach((b) => b.classList.toggle('is-active', b === btn));
+      formatButtons.forEach((b) => {
+        b.classList.toggle('is-active', b === btn);
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
       runConversion();
     });
   });

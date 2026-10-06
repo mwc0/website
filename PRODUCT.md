@@ -23,26 +23,26 @@ A hand-built, personality-driven alternative to generic game-aggregator or conve
 - Static site, no server-rendering; deployed via GitHub Pages at the custom domain `matthew.quest` (see `CNAME`).
 - Supabase Realtime Presence powers the live "people here right now" indicator; Supabase also backs the Snake leaderboard. These are the only server-side dependencies in the product.
 - Google Analytics (gtag.js) is attached site-wide for traffic visibility.
-- Games run in draggable, resizable desktop-style windows (`common.js`), a shared interaction pattern across the games page and the homepage hero terminal.
+- Games and tools run in draggable, resizable desktop-style windows (`common.js`, `desktop.js`), a shared interaction pattern across the games and tools pages.
 - Both a dark and light theme are supported, toggled per-visitor and persisted via `localStorage`, defaulting to system preference.
 
 ## Capabilities and Constraints
 
 - Three games: Snake (with a global high-score leaderboard), Wordle (unlimited daily plays, no daily-limit gate), and Driftwalk (an endless tunnel runner).
-- One tool: a converter for length, weight, temperature, and currency, with currency using live exchange rates and a hardcoded fallback table if the fetch fails.
+- Four tools: Convert (length, weight, temperature, and currency, with currency using live exchange rates and a hardcoded fallback table if the fetch fails), Epoch (unix timestamps), Base (number bases, base64 and URL encoding), and Colour (notations and contrast ratios).
 - No user accounts, no login, no persistent user data beyond a browser-local Snake best score and a leaderboard initials entry.
 - No backend beyond Supabase's presence/leaderboard usage; no stated intent to add more server-side surface, but this isn't a hard constraint the owner flagged, just the current state.
 - No stated constraint against ads, monetization, or changing the game/tool set — the owner explicitly left these open rather than fixing them.
 
 ## Brand Commitments
 
-- Name/domain: `matthew.quest`. Owner referred to as "matthew" in the hero terminal's `guest@matthew.quest` framing.
+- Name/domain: `matthew.quest`. The mark is an upward arrowhead (`images/favicon.svg`, `#i-mark` in `images/icons.svg`).
 - Design must not read as "AI-generated": no generic/templated/cookie-cutter aesthetics (stock gradients, default component look, overused icon sets, predictable layouts). Aim for professional, unique, deliberately-crafted choices. (Recorded standing instruction; see `CLAUDE.md`.)
 
 ## Evidence on Hand
 
 - No testimonials, case studies, press, or external evidence exist. None should be invented.
-- Visual/interaction system already implemented in code (dark-first terminal aesthetic, IBM Plex Mono throughout, green accent, draggable console-style windows) — this is incumbent evidence for future design work, not yet separately documented in a DESIGN.md.
+- Visual/interaction system implemented in code and documented in `DESIGN.md` ("The Lit Schematic": midnight field, one beam of light, registration frames, glass plates, Host Grotesk with Azeret Mono for data, draggable windows). It replaced the earlier green terminal look in October 2026, taking the AuthKit marketing site as its reference.
 
 ## Product Principles
 
